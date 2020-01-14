@@ -1,5 +1,6 @@
-Main: main.o
-	g++ -g main.o -o Main
+Main: main.cpp TextChart.o
+	g++ -g main.cpp TextChart.o -o Main
 
-main.o: main.cpp
-	g++ -g -c main.cpp
+
+TextChart.o: ./Source/TextChart.cpp
+	g++ -g -c ./Source/TextChart.cpp -o TextChart.o
