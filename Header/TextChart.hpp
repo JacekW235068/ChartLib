@@ -5,14 +5,19 @@
 #include <algorithm>
 #include <iostream>
 
-#include "Enum/Scale.cpp"
-#include "Enum/Linearity.cpp"
+#include "../Enum/Scale.cpp"
+#include "../Enum/Linearity.cpp"
 
 
 class TextChart
 {
 //protected:
 public:
+    //chart settings
+    Linearity linearity;
+    Scale scale;
+    //terminal character cell aspect ratio X/Y
+    double cellAspectRatio;
     //Array of printable data
     char** printableData;
     std::pair<unsigned, unsigned> windowSize;
@@ -27,13 +32,17 @@ public:
     double max_x;
     //METHODS
     char** createPrintableData();
+    std::pair<double, double> valueRange_scalex();
+    std::pair<double, double> valueRange_scaley();
+    std::pair<double, double> valueRange_stretch();
     void Draw(std::ostream& stream);
     //CONSTRUCTORS
     TextChart(std::pair<unsigned, unsigned> WindowSize,
         std::vector<std::pair<double, double>> DataSet,
         char Symbol = 'o',
         Scale Scale = Scale::stretch,
-        Linearity  Linearity = Linearity::Dots 
+        Linearity  Linearity = Linearity::Dots,
+        double CellAspectRatio = 0.5
         );
     ~TextChart();
     

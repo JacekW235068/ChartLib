@@ -4,12 +4,17 @@
 
 TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
         std::vector<std::pair<double, double>> DataSet,
-        char Symbol = 'o',
-        Scale Scale = Scale::stretch,
-        Linearity  Linearity = Linearity::Dots) 
-            : windowSize(WindowSize),
-            symbol(Symbol),
-            dataSet(DataSet)
+        char Symbol,
+        Scale Scale,
+        Linearity  Linearity,
+        double CellAspectRatio
+        ) : windowSize(WindowSize),
+        symbol(Symbol),
+        dataSet(DataSet),
+        linearity(Linearity),
+        scale(Scale),
+        cellAspectRatio(CellAspectRatio)
+
 {
     printableData = nullptr;
 }
@@ -62,12 +67,21 @@ char** TextChart::createPrintableData(){
             max_y = data.second;
     }
     }
-    //range of x axis
-    double valueRangeX = abs(max_x - min_x);
-    //range of y axis
-    double valueRangeY = abs(max_y - min_y);
-    printableData = new char*[windowSize.second];
+    std::pair<double,double> range;
+    switch (scale)
+    {
+    case Scale::AlignToX:
+        range = valueRange_scalex();
+        break;
+    case Scale::AlignToy:
+        range = valueRange_scaley();
+        break;    
+    default:
+        range = valueRange_stretch();
+        break;
+    }
     //create and prefill printable array of chars
+    printableData = new char*[windowSize.second];
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];
         for(int j = 0; j < windowSize.first; j++)
@@ -75,8 +89,8 @@ char** TextChart::createPrintableData(){
     }
     //asign each element to place in chart
     for(const auto& data : dataSet){
-        int y = static_cast<int>(abs(data.second-min_y)/valueRangeY*(windowSize.second-1));
-        int x =static_cast<int>(abs(data.first-min_x)/valueRangeX*(windowSize.first-1));
+        int y = static_cast<int>(abs(data.second-min_y)/range.second*(windowSize.second-1));
+        int x =static_cast<int>(abs(data.first-min_x)/range.first*(windowSize.first-1));
         printableData
             [y]
             [x] = symbol;
@@ -93,4 +107,29 @@ void TextChart::Draw(std::ostream& stream){
     }
     output += "end\n"; 
     stream << output;
+}
+std::pair<double, double> TextChart::valueRange_stretch(){
+    //range of x axis
+    double valueRangeX = abs(max_x - min_x);
+    //range of y axis
+    double valueRangeY = abs(max_y - min_y);
+    return std::pair<double,double>(valueRangeX, valueRangeY);
+}
+
+//TODO
+std::pair<double, double> TextChart::valueRange_scaley(){
+    //range of x axis
+    double valueRangeX = abs(max_x - min_x);
+    //range of y axis
+    double valueRangeY = abs(max_y - min_y);
+    return std::pair<double,double>(valueRangeX, valueRangeY);
+}
+
+//TODO
+std::pair<double, double> TextChart::valueRange_scalex(){
+    //range of x axis
+    double valueRangeX = abs(max_x - min_x);
+    //range of y axis
+    double valueRangeY = abs(max_y - min_y);
+    return std::pair<double,double>(valueRangeX, valueRangeY);
 }
