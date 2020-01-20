@@ -1,11 +1,12 @@
-#include "../Headers/TextChart.hpp"
+#include "../Header/TextChart.hpp"
 
 
 
 TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
-        char Symbol,
         std::vector<std::pair<double, double>> DataSet,
-        bool Fast) 
+        char Symbol = 'o',
+        Scale Scale = Scale::stretch,
+        Linearity  Linearity = Linearity::Dots) 
             : windowSize(WindowSize),
             symbol(Symbol),
             dataSet(DataSet)
@@ -15,14 +16,20 @@ TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
 
 TextChart::~TextChart()
 {
+    if(printableData != nullptr){
+        for(int i = 0; i < windowSize.second; i++){
+            delete printableData[i];
+        }
+        delete printableData;
+    }
 }
 
 char** TextChart::createPrintableData(){
     if(printableData != nullptr){
         for(int i = 0; i < windowSize.second; i++){
             delete printableData[i];
+        }
         delete printableData;
-    }
     }
     //Find min and max values in dataset 
     if(dataSet.size() == 0){
@@ -55,9 +62,9 @@ char** TextChart::createPrintableData(){
             max_y = data.second;
     }
     }
-    //visible range of x axis
+    //range of x axis
     double valueRangeX = abs(max_x - min_x);
-    //visible range of y axis
+    //range of y axis
     double valueRangeY = abs(max_y - min_y);
     printableData = new char*[windowSize.second];
     //create and prefill printable array of chars
@@ -78,10 +85,12 @@ char** TextChart::createPrintableData(){
 }
 void TextChart::Draw(std::ostream& stream){
     std::string output;
+    output += "start\n"; 
     for(int i = windowSize.second-1; i >= 0; i--){
         for(int j = 0; j < windowSize.first; j++)
             output += printableData[i][j];
         output += '\n';
     }
+    output += "end\n"; 
     stream << output;
 }
