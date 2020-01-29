@@ -16,27 +16,24 @@ TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
         cellAspectRatio(CellAspectRatio)
 
 {
-    printableData = nullptr;
+    printableData = new char*[windowSize.second];
+    for(int i = 0; i < windowSize.second; i++){
+        printableData[i] = new char[windowSize.first];   
+    }
+    setRange();
 }
 
 TextChart::~TextChart()
 {
-    if(printableData != nullptr){
         for(int i = 0; i < windowSize.second; i++){
             delete printableData[i];
+            printableData[i] = nullptr;
         }
         delete printableData;
-    }
+        printableData = nullptr;
 }
 
-char** TextChart::createPrintableData(){
-    if(printableData != nullptr){
-        for(int i = 0; i < windowSize.second; i++){
-            delete printableData[i];
-        }
-        delete printableData;
-    }
-    //Find min and max values in dataset 
+void TextChart::setRange(){
     if(dataSet.size() == 0){
         min_y = -1;
         min_x = -1;
@@ -65,8 +62,12 @@ char** TextChart::createPrintableData(){
             min_y = data.second;
         else if(data.second > max_y)
             max_y = data.second;
+        }
     }
-    }
+}
+
+char** TextChart::createPrintableData(){
+    //calculate visible range for axis
     std::pair<double,double> range;
     switch (scale)
     {
@@ -81,19 +82,17 @@ char** TextChart::createPrintableData(){
         break;
     }
     //create and prefill printable array of chars
-    printableData = new char*[windowSize.second];
     for(int i = 0; i < windowSize.second; i++){
-        printableData[i] = new char[windowSize.first];
         for(int j = 0; j < windowSize.first; j++)
             printableData[i][j] = ' ';
     }
     //asign each element to place in chart
     for(const auto& data : dataSet){
-        int y = static_cast<int>(abs(data.second-min_y)/range.second*(windowSize.second-1));
-        int x =static_cast<int>(abs(data.first-min_x)/range.first*(windowSize.first-1));
-        printableData
-            [y]
-            [x] = symbol;
+        int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
+        int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
+        //check if in visible range
+        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
+            printableData[y][x] = symbol;
     }
     return printableData;
 }
@@ -113,23 +112,37 @@ std::pair<double, double> TextChart::valueRange_stretch(){
     double valueRangeX = abs(max_x - min_x);
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
+    //adjust visible range
+    visible_min_y = min_y;
+    visible_min_x = min_x;
+    visible_max_y = max_y;
+    visible_max_x = max_x;
     return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
-//TODO
 std::pair<double, double> TextChart::valueRange_scaley(){
-    //range of x axis
-    double valueRangeX = abs(max_x - min_x);
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
+    //Y range per cell (with cell aspect ratio included) * X cells
+    double valueRangeX = valueRangeY/(windowSize.second)*windowSize.first*cellAspectRatio;
+    //adjust visible range
+    visible_min_y = min_y;
+    visible_min_x = (min_x+max_x)/2 - valueRangeX/2;
+    visible_max_y = max_y;
+    visible_max_x = visible_min_x + valueRangeX;
     return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
-//TODO
+
 std::pair<double, double> TextChart::valueRange_scalex(){
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
     //range of y axis
-    double valueRangeY = abs(max_y - min_y);
+    double valueRangeY = valueRangeX/(windowSize.first*cellAspectRatio)*windowSize.second;
+    //adjust visible range
+    visible_min_y = (min_y+max_y)/2 - valueRangeY/2;;
+    visible_min_x = min_x;
+    visible_max_y = visible_min_y + valueRangeY;
+    visible_max_x = max_x;
     return std::pair<double,double>(valueRangeX, valueRangeY);
 }

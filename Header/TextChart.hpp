@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 #include "../Enum/Scale.cpp"
 #include "../Enum/Linearity.cpp"
@@ -30,12 +31,18 @@ public:
     double min_x;
     double max_y;
     double max_x;
+    double visible_min_y;
+    double visible_min_x;
+    double visible_max_y;
+    double visible_max_x;
     //METHODS
     char** createPrintableData();
     std::pair<double, double> valueRange_scalex();
     std::pair<double, double> valueRange_scaley();
     std::pair<double, double> valueRange_stretch();
     void Draw(std::ostream& stream);
+    //set default range
+    void setRange();
     //CONSTRUCTORS
     TextChart(std::pair<unsigned, unsigned> WindowSize,
         std::vector<std::pair<double, double>> DataSet,
