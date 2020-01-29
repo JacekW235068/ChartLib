@@ -24,8 +24,6 @@ public:
     std::pair<unsigned, unsigned> windowSize;
     //symbol used for drawing chart
     char symbol;
-    // <x,y> set of data to include
-    std::vector<std::pair<double, double>> dataSet;
     //range of chart
     double min_y;
     double min_x;
@@ -36,16 +34,16 @@ public:
     double visible_max_y;
     double visible_max_x;
     //METHODS
-    char** createPrintableData();
+    char** createPrintableData(std::vector<std::pair<double, double>>& DataSet);
     std::pair<double, double> valueRange_scalex();
     std::pair<double, double> valueRange_scaley();
     std::pair<double, double> valueRange_stretch();
-    void Draw(std::ostream& stream);
+    friend std::ostream& operator<<(std::ostream& s, const TextChart& t);
     //set default range
-    void setRange();
+    void setRange(std::vector<std::pair<double, double>>& DataSet);
     //CONSTRUCTORS
     TextChart(std::pair<unsigned, unsigned> WindowSize,
-        std::vector<std::pair<double, double>> DataSet,
+        std::vector<std::pair<double, double>> &DataSet,
         char Symbol = 'o',
         Scale Scale = Scale::stretch,
         Linearity  Linearity = Linearity::Dots,

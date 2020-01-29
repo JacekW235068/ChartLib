@@ -3,14 +3,13 @@
 
 
 TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
-        std::vector<std::pair<double, double>> DataSet,
+        std::vector<std::pair<double, double>> &DataSet,
         char Symbol,
         Scale Scale,
         Linearity  Linearity,
         double CellAspectRatio
         ) : windowSize(WindowSize),
         symbol(Symbol),
-        dataSet(DataSet),
         linearity(Linearity),
         scale(Scale),
         cellAspectRatio(CellAspectRatio)
@@ -20,7 +19,7 @@ TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];   
     }
-    setRange();
+    createPrintableData(DataSet);
 }
 
 TextChart::~TextChart()
@@ -33,7 +32,7 @@ TextChart::~TextChart()
         printableData = nullptr;
 }
 
-void TextChart::setRange(){
+void TextChart::setRange(std::vector<std::pair<double, double>>& dataSet){
     if(dataSet.size() == 0){
         min_y = -1;
         min_x = -1;
@@ -66,8 +65,9 @@ void TextChart::setRange(){
     }
 }
 
-char** TextChart::createPrintableData(){
+char** TextChart::createPrintableData(std::vector<std::pair<double, double>>& dataSet){
     //calculate visible range for axis
+    setRange(dataSet);
     std::pair<double,double> range;
     switch (scale)
     {
@@ -95,17 +95,6 @@ char** TextChart::createPrintableData(){
             printableData[y][x] = symbol;
     }
     return printableData;
-}
-void TextChart::Draw(std::ostream& stream){
-    std::string output;
-    output += "start\n"; 
-    for(int i = windowSize.second-1; i >= 0; i--){
-        for(int j = 0; j < windowSize.first; j++)
-            output += printableData[i][j];
-        output += '\n';
-    }
-    output += "end\n"; 
-    stream << output;
 }
 std::pair<double, double> TextChart::valueRange_stretch(){
     //range of x axis
@@ -145,4 +134,20 @@ std::pair<double, double> TextChart::valueRange_scalex(){
     visible_max_y = visible_min_y + valueRangeY;
     visible_max_x = max_x;
     return std::pair<double,double>(valueRangeX, valueRangeY);
+}
+
+
+
+//operators
+std::ostream& operator<<(std::ostream& s, const TextChart& t){
+    std::string output;
+    output += "start\n"; 
+    for(int i = t.windowSize.second-1; i >= 0; i--){
+        for(int j = 0; j < t.windowSize.first; j++)
+            output += t.printableData[i][j];
+        output += '\n';
+    }
+    output += "end\n"; 
+    s << output;
+    return s;
 }
