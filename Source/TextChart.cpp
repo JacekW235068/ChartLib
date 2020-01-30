@@ -66,9 +66,9 @@ void TextChart::setRange(std::vector<std::pair<double, double>>& dataSet){
 }
 
 char** TextChart::createPrintableData(std::vector<std::pair<double, double>>& dataSet){
-    //calculate visible range for axis
     setRange(dataSet);
     std::pair<double,double> range;
+    //calculate value range, set boundries
     switch (scale)
     {
     case Scale::AlignToX:
@@ -81,18 +81,15 @@ char** TextChart::createPrintableData(std::vector<std::pair<double, double>>& da
         range = valueRange_stretch();
         break;
     }
-    //create and prefill printable array of chars
-    for(int i = 0; i < windowSize.second; i++){
-        for(int j = 0; j < windowSize.first; j++)
-            printableData[i][j] = ' ';
-    }
-    //asign each element to place in chart
-    for(const auto& data : dataSet){
-        int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
-        int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
-        //check if in visible range
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
-            printableData[y][x] = symbol;
+    //draw chart
+    switch (linearity)
+    {
+    case Linearity::Linear:
+        drawLines(dataSet, range);
+        break;
+    default:
+        drawDots(dataSet, range);
+        break;
     }
     return printableData;
 }
@@ -136,7 +133,72 @@ std::pair<double, double> TextChart::valueRange_scalex(){
     return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
-
+void TextChart::drawDots(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
+    //prefill printable array of chars
+    for(int i = 0; i < windowSize.second; i++){
+        for(int j = 0; j < windowSize.first; j++)
+            printableData[i][j] = ' ';
+    }
+    //asign each element to place in chart
+    for(const auto& data : DataSet){
+        int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
+        int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
+        //check if in visible range
+        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
+            printableData[y][x] = symbol;
+    }
+}
+void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
+    bool previous = false;
+    //prefill printable array of chars
+    for(int i = 0; i < windowSize.second; i++){
+        for(int j = 0; j < windowSize.first; j++)
+            printableData[i][j] = ' ';
+    }
+    std::pair<int,int> previousCoords(
+        static_cast<int>(round((DataSet.begin()->first-visible_min_x)/range.first*(windowSize.first-1))),
+        static_cast<int>(round((DataSet.begin()->second-visible_min_y)/range.second*(windowSize.second-1)))
+    );
+    previous = (previousCoords.first >= 0 && previousCoords.second >= 0 &&
+     previousCoords.first < windowSize.first && previousCoords.second < windowSize.second);
+    std::for_each(++DataSet.begin(), DataSet.end(), [&](std::pair<double,double>& node){
+        int y = static_cast<int>(round((node.second-visible_min_y)/range.second*(windowSize.second-1)));
+        int x =static_cast<int>(round((node.first-visible_min_x)/range.first*(windowSize.first-1)));
+        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second && previous){
+            if (x == previousCoords.first){
+                for(int i = std::min(previousCoords.second, y); i <= std::max(previousCoords.second, y); i++)
+                    printableData[i][x] = symbol;
+            }
+            else if (y == previousCoords.second){
+                for(int i = std::min(previousCoords.first, x); i <= std::max(previousCoords.first, x); i++)
+                    printableData[y][i] = symbol;
+            }
+            else{
+                //ax+b=y
+                double a = static_cast<double>(y - previousCoords.second) / (x - previousCoords.first);
+                double b = node.second - (a*node.first);
+                double jump;
+                int min_value;
+                int max_value;
+                if(abs(x - previousCoords.first) > abs(y - previousCoords.second)){
+                    min_value = std::min(previousCoords.first, x);
+                    max_value = std::max(previousCoords.first, x);
+                    for(int i = min_value; i <= max_value; i++){
+                        printableData[static_cast<int>(a*i + b)][i];
+                    } 
+                }else{
+                    min_value = std::min(previousCoords.second, y);
+                    max_value = std::max(previousCoords.second, y);
+                    for(int i = min_value; i <= max_value; i++){
+                        printableData[i][static_cast<int>(static_cast<double>(i-b)/a)];
+                    } 
+                }
+            }
+            
+              //TODO
+        }
+    });
+}
 
 //operators
 std::ostream& operator<<(std::ostream& s, const TextChart& t){
