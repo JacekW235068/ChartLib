@@ -56,6 +56,8 @@ public:
     //Linearity methods, "draws" symbol onto printable data
     void drawDots(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range);
     void drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range);
+    //Draw line between p1 and p2, no safety pass correct args
+    void drawLine(std::pair<int, int> p1, std::pair<int, int> p2);
 
 
     

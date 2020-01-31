@@ -148,8 +148,9 @@ void TextChart::drawDots(std::vector<std::pair<double, double>>& DataSet, std::p
             printableData[y][x] = symbol;
     }
 }
+
 void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
-    bool previous = false;
+    bool previous;
     //prefill printable array of chars
     for(int i = 0; i < windowSize.second; i++){
         for(int j = 0; j < windowSize.first; j++)
@@ -160,44 +161,62 @@ void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::
         static_cast<int>(round((DataSet.begin()->second-visible_min_y)/range.second*(windowSize.second-1)))
     );
     previous = (previousCoords.first >= 0 && previousCoords.second >= 0 &&
-     previousCoords.first < windowSize.first && previousCoords.second < windowSize.second);
-    std::for_each(++DataSet.begin(), DataSet.end(), [&](std::pair<double,double>& node){
-        int y = static_cast<int>(round((node.second-visible_min_y)/range.second*(windowSize.second-1)));
-        int x =static_cast<int>(round((node.first-visible_min_x)/range.first*(windowSize.first-1)));
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second && previous){
-            if (x == previousCoords.first){
-                for(int i = std::min(previousCoords.second, y); i <= std::max(previousCoords.second, y); i++)
-                    printableData[i][x] = symbol;
-            }
-            else if (y == previousCoords.second){
-                for(int i = std::min(previousCoords.first, x); i <= std::max(previousCoords.first, x); i++)
-                    printableData[y][i] = symbol;
-            }
-            else{
-                //ax+b=y
-                double a = static_cast<double>(y - previousCoords.second) / (x - previousCoords.first);
-                double b = node.second - (a*node.first);
-                double jump;
-                int min_value;
-                int max_value;
-                if(abs(x - previousCoords.first) > abs(y - previousCoords.second)){
-                    min_value = std::min(previousCoords.first, x);
-                    max_value = std::max(previousCoords.first, x);
-                    for(int i = min_value; i <= max_value; i++){
-                        printableData[static_cast<int>(a*i + b)][i];
-                    } 
-                }else{
-                    min_value = std::min(previousCoords.second, y);
-                    max_value = std::max(previousCoords.second, y);
-                    for(int i = min_value; i <= max_value; i++){
-                        printableData[i][static_cast<int>(static_cast<double>(i-b)/a)];
-                    } 
-                }
-            }
-            
-              //TODO
-        }
+        previousCoords.first < windowSize.first && previousCoords.second < windowSize.second);
+    
+    std::for_each(++DataSet.begin(), DataSet.end(), [&](std::pair<double,double>& data){
+        int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
+        int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
+        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second || previous)
+            drawLine(previousCoords, {x,y});
+        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
+            previous = true;
+        previousCoords = {x,y};
     });
+}
+
+
+void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
+    if (p1.first == p2.first){
+        for(int i = std::min(p1.second, p2.second); i <= std::max(p1.second, p2.second); i++)
+            if(p1.first >= 0 && p1.first < windowSize.first &&
+            i >= 0 && i < windowSize.second)
+                printableData[i][p1.first] = symbol;
+    }
+    else if (p1.second == p2.second){
+        for(int i = std::min(p1.first, p1.first); i <= std::max(p1.first, p1.first); i++)
+            if(p1.second >= 0 && p1.second < windowSize.second &&
+            i >= 0 && i < windowSize.first)
+                printableData[p1.second][i] = symbol;
+    }
+    else{
+        unsigned x_length = abs(p1.first - p2.first);
+        unsigned y_length = abs(p1.second - p2.second);
+        if(x_length > y_length){
+            //ax+b=y
+            double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
+            double b = static_cast<double>(p1.second) - (a*p1.first);
+            int x = std::min(p1.first, p2.first);
+            double y = a*x + b;
+            for(x; x <= std::max(p1.first, p2.first); x++ ){
+                if(x >= 0 && x < windowSize.first &&
+                y >= 0 && static_cast<int>(round(y)) < windowSize.second)
+                    printableData[static_cast<int>(round(y))][x] = symbol;
+                y+=a;
+            }
+        }else{
+            //x = ay + b
+            double a = static_cast<double>(p2.first - p1.first) / (p2.second - p1.second);
+            double b = static_cast<double>(p1.first) - (a*p1.second);
+            int y = std::min(p1.second, p2.second);
+            double x = a*y+b;
+            for(y; y <= std::max(p1.second, p2.second); y++ ){
+                if(x >= 0 && static_cast<int>(round(x)) < windowSize.first &&
+                y >= 0 && y < windowSize.second)
+                    printableData[y][static_cast<int>(round(x))] = symbol;
+                x+=a;
+            }
+        }
+    }
 }
 
 //operators
