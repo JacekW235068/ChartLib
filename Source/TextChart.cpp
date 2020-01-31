@@ -6,20 +6,22 @@ TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
         std::vector<std::pair<double, double>> &DataSet,
         char Symbol,
         Scale Scale,
-        Linearity  Linearity,
+        Style Style,
         double CellAspectRatio
         ) : windowSize(WindowSize),
         symbol(Symbol),
-        linearity(Linearity),
+        style(Style),
         scale(Scale),
         cellAspectRatio(CellAspectRatio)
 
 {
+    //create array of chars for chart  
     printableData = new char*[windowSize.second];
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];   
     }
-    createPrintableData(DataSet);
+    //fill array with data
+    createChart(DataSet);
 }
 
 TextChart::~TextChart()
@@ -39,13 +41,6 @@ void TextChart::setRange(std::vector<std::pair<double, double>>& dataSet){
         max_y = 1;
         max_x = 1;
     }
-    else if(dataSet.size() == 1){
-        auto& element = *dataSet.begin();
-        min_y = element.second-1;
-        min_x = element.first -1;
-        max_y = element.second+1;
-        max_x = element.first +1;
-    }
     else{
         auto& element = *dataSet.begin();
         min_y = element.second;
@@ -62,19 +57,27 @@ void TextChart::setRange(std::vector<std::pair<double, double>>& dataSet){
         else if(data.second > max_y)
             max_y = data.second;
         }
+    }//add some space for specific cases
+    if(min_x == max_x){
+        min_x -= 1.0;
+        max_x += 1.0;
+    }
+    if(min_y == max_y){
+        min_y -= 1.0;
+        max_y += 1.0;
     }
 }
 
-char** TextChart::createPrintableData(std::vector<std::pair<double, double>>& dataSet){
+char** TextChart::createChart(std::vector<std::pair<double, double>>& dataSet){
     setRange(dataSet);
     std::pair<double,double> range;
-    //calculate value range, set boundries
+    //calculate visible value range, set limits
     switch (scale)
     {
     case Scale::AlignToX:
         range = valueRange_scalex();
         break;
-    case Scale::AlignToy:
+    case Scale::AlignToY:
         range = valueRange_scaley();
         break;    
     default:
@@ -82,9 +85,9 @@ char** TextChart::createPrintableData(std::vector<std::pair<double, double>>& da
         break;
     }
     //draw chart
-    switch (linearity)
+    switch (style)
     {
-    case Linearity::Linear:
+    case Style::Linear:
         drawLines(dataSet, range);
         break;
     default:
@@ -94,11 +97,11 @@ char** TextChart::createPrintableData(std::vector<std::pair<double, double>>& da
     return printableData;
 }
 std::pair<double, double> TextChart::valueRange_stretch(){
-    //range of x axis
+    //visible range of x axis
     double valueRangeX = abs(max_x - min_x);
-    //range of y axis
+    //visible range of y axis
     double valueRangeY = abs(max_y - min_y);
-    //adjust visible range
+    //set limits
     visible_min_y = min_y;
     visible_min_x = min_x;
     visible_max_y = max_y;
@@ -109,9 +112,9 @@ std::pair<double, double> TextChart::valueRange_stretch(){
 std::pair<double, double> TextChart::valueRange_scaley(){
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
-    //Y range per cell (with cell aspect ratio included) * X cells
+    //y range per cell (with cell aspect ratio included) * X cells
     double valueRangeX = valueRangeY/(windowSize.second)*windowSize.first*cellAspectRatio;
-    //adjust visible range
+    //set limits
     visible_min_y = min_y;
     visible_min_x = (min_x+max_x)/2 - valueRangeX/2;
     visible_max_y = max_y;
@@ -123,9 +126,9 @@ std::pair<double, double> TextChart::valueRange_scaley(){
 std::pair<double, double> TextChart::valueRange_scalex(){
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
-    //range of y axis
+    //x range per cell  * y cells (with cell aspect ratio included)
     double valueRangeY = valueRangeX/(windowSize.first*cellAspectRatio)*windowSize.second;
-    //adjust visible range
+    //set limits
     visible_min_y = (min_y+max_y)/2 - valueRangeY/2;;
     visible_min_x = min_x;
     visible_max_y = visible_min_y + valueRangeY;
@@ -150,24 +153,29 @@ void TextChart::drawDots(std::vector<std::pair<double, double>>& DataSet, std::p
 }
 
 void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
+    //was previous point visible
     bool previous;
     //prefill printable array of chars
     for(int i = 0; i < windowSize.second; i++){
         for(int j = 0; j < windowSize.first; j++)
             printableData[i][j] = ' ';
     }
+    //coords for first point skipped in loop
     std::pair<int,int> previousCoords(
         static_cast<int>(round((DataSet.begin()->first-visible_min_x)/range.first*(windowSize.first-1))),
         static_cast<int>(round((DataSet.begin()->second-visible_min_y)/range.second*(windowSize.second-1)))
     );
     previous = (previousCoords.first >= 0 && previousCoords.second >= 0 &&
         previousCoords.first < windowSize.first && previousCoords.second < windowSize.second);
-    
+
     std::for_each(++DataSet.begin(), DataSet.end(), [&](std::pair<double,double>& data){
+        //coords of new point
         int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
+        //if old or new is visible draw line
         if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second || previous)
             drawLine(previousCoords, {x,y});
+        //new point becomes old
         if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
             previous = true;
         previousCoords = {x,y};
@@ -176,6 +184,7 @@ void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::
 
 
 void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
+    //straight line cases
     if (p1.first == p2.first){
         for(int i = std::min(p1.second, p2.second); i <= std::max(p1.second, p2.second); i++)
             if(p1.first >= 0 && p1.first < windowSize.first &&
@@ -191,12 +200,14 @@ void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
     else{
         unsigned x_length = abs(p1.first - p2.first);
         unsigned y_length = abs(p1.second - p2.second);
+        //pick one providing higher resolution so it fills everything between two points
         if(x_length > y_length){
-            //ax+b=y
+            //y=ax+b
             double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
             double b = static_cast<double>(p1.second) - (a*p1.first);
             int x = std::min(p1.first, p2.first);
             double y = a*x + b;
+            //put in array if it fits
             for(x; x <= std::max(p1.first, p2.first); x++ ){
                 if(x >= 0 && x < windowSize.first &&
                 y >= 0 && static_cast<int>(round(y)) < windowSize.second)
@@ -204,6 +215,7 @@ void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
                 y+=a;
             }
         }else{
+            //same as above exept with this formula
             //x = ay + b
             double a = static_cast<double>(p2.first - p1.first) / (p2.second - p1.second);
             double b = static_cast<double>(p1.first) - (a*p1.second);
@@ -220,15 +232,11 @@ void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
 }
 
 //operators
-std::ostream& operator<<(std::ostream& s, const TextChart& t){
-    std::string output;
-    output += "start\n"; 
+std::ostream& operator<<(std::ostream& s, const TextChart& t){ 
     for(int i = t.windowSize.second-1; i >= 0; i--){
         for(int j = 0; j < t.windowSize.first; j++)
-            output += t.printableData[i][j];
-        output += '\n';
-    }
-    output += "end\n"; 
-    s << output;
+            s << t.printableData[i][j];
+        s << '\n';
+    } 
     return s;
 }

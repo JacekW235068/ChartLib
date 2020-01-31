@@ -2,5 +2,5 @@
 enum class Scale { 
     stretch,
     AlignToX,
-    AlignToy
+    AlignToY
 };
