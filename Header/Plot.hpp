@@ -10,11 +10,11 @@
 #include "../Enum/Style.cpp"
 
 
-class TextChart
+class Plot
 {
-//protected:
+protected:
 public:
-    //DATA
+    //DAT
     //chart settings
     Style style;
     Scale scale;
@@ -36,14 +36,15 @@ public:
     double visible_max_x;
 
     //CONSTRUCTORS
-    TextChart(std::pair<unsigned, unsigned> WindowSize,
+    
+    Plot(std::pair<unsigned, unsigned> WindowSize,
         std::vector<std::pair<double, double>> &DataSet,
         char Symbol = 'o',
         Scale Scale = Scale::stretch,
         Style Style =Style::dots,
         double CellAspectRatio = 0.5
         );
-    ~TextChart();
+    ~Plot();
 
     //METHODS
     //find min/max X/Y
@@ -62,5 +63,5 @@ public:
 
     
     //FRIENDS AND STUFF
-    friend std::ostream& operator<<(std::ostream& s, const TextChart& t);
+    friend std::ostream& operator<<(std::ostream& s, const Plot& t);
 };

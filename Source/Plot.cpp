@@ -1,8 +1,8 @@
-#include "../Header/TextChart.hpp"
+#include "../Header/Plot.hpp"
 
 
 
-TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
+Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
         std::vector<std::pair<double, double>> &DataSet,
         char Symbol,
         Scale Scale,
@@ -24,7 +24,7 @@ TextChart::TextChart(std::pair<unsigned, unsigned> WindowSize,
     createChart(DataSet);
 }
 
-TextChart::~TextChart()
+Plot::~Plot()
 {
         for(int i = 0; i < windowSize.second; i++){
             delete printableData[i];
@@ -34,7 +34,7 @@ TextChart::~TextChart()
         printableData = nullptr;
 }
 
-void TextChart::setRange(std::vector<std::pair<double, double>>& dataSet){
+void Plot::setRange(std::vector<std::pair<double, double>>& dataSet){
     if(dataSet.size() == 0){
         min_y = -1;
         min_x = -1;
@@ -68,7 +68,7 @@ void TextChart::setRange(std::vector<std::pair<double, double>>& dataSet){
     }
 }
 
-char** TextChart::createChart(std::vector<std::pair<double, double>>& dataSet){
+char** Plot::createChart(std::vector<std::pair<double, double>>& dataSet){
     setRange(dataSet);
     std::pair<double,double> range;
     //calculate visible value range, set limits
@@ -96,7 +96,7 @@ char** TextChart::createChart(std::vector<std::pair<double, double>>& dataSet){
     }
     return printableData;
 }
-std::pair<double, double> TextChart::valueRange_stretch(){
+std::pair<double, double> Plot::valueRange_stretch(){
     //visible range of x axis
     double valueRangeX = abs(max_x - min_x);
     //visible range of y axis
@@ -109,7 +109,7 @@ std::pair<double, double> TextChart::valueRange_stretch(){
     return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
-std::pair<double, double> TextChart::valueRange_scaley(){
+std::pair<double, double> Plot::valueRange_scaley(){
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
     //y range per cell (with cell aspect ratio included) * X cells
@@ -123,7 +123,7 @@ std::pair<double, double> TextChart::valueRange_scaley(){
 }
 
 
-std::pair<double, double> TextChart::valueRange_scalex(){
+std::pair<double, double> Plot::valueRange_scalex(){
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
     //x range per cell  * y cells (with cell aspect ratio included)
@@ -136,7 +136,7 @@ std::pair<double, double> TextChart::valueRange_scalex(){
     return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
-void TextChart::drawDots(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
+void Plot::drawDots(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
     //prefill printable array of chars
     for(int i = 0; i < windowSize.second; i++){
         for(int j = 0; j < windowSize.first; j++)
@@ -152,7 +152,7 @@ void TextChart::drawDots(std::vector<std::pair<double, double>>& DataSet, std::p
     }
 }
 
-void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
+void Plot::drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
     //was previous point visible
     bool previous;
     //prefill printable array of chars
@@ -183,7 +183,7 @@ void TextChart::drawLines(std::vector<std::pair<double, double>>& DataSet, std::
 }
 
 
-void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
+void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
     //straight line cases
     if (p1.first == p2.first){
         for(int i = std::min(p1.second, p2.second); i <= std::max(p1.second, p2.second); i++)
@@ -232,7 +232,7 @@ void TextChart::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
 }
 
 //operators
-std::ostream& operator<<(std::ostream& s, const TextChart& t){ 
+std::ostream& operator<<(std::ostream& s, const Plot& t){ 
     for(int i = t.windowSize.second-1; i >= 0; i--){
         for(int j = 0; j < t.windowSize.first; j++)
             s << t.printableData[i][j];
