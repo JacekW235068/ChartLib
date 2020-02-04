@@ -1,100 +1,90 @@
-#include "../Header/Plot.hpp"
+ #include "../Header/Plot.hpp"
+
 
 
 
 Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
-        std::vector<std::pair<double, double>> &DataSet,
-        char Symbol,
-        Scale Scale,
-        Style Style,
-        double CellAspectRatio
-        ) : windowSize(WindowSize),
-        symbol(Symbol),
-        style(Style),
-        scale(Scale),
-        cellAspectRatio(CellAspectRatio)
-
+    Scale Scale,
+    double CellAspectRatio
+    ) :
+    windowSize(WindowSize),
+    scale(Scale),
+    cellAspectRatio(CellAspectRatio) 
 {
+    dataSets = std::list<std::reference_wrapper<PlotData>>();
     //create array of chars for chart  
     printableData = new char*[windowSize.second];
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];   
     }
-    //fill array with data
-    createChart(DataSet);
 }
-
 Plot::~Plot()
 {
-        for(int i = 0; i < windowSize.second; i++){
-            delete printableData[i];
-            printableData[i] = nullptr;
-        }
-        delete printableData;
-        printableData = nullptr;
+    for(int i = 0; i < windowSize.second; i++){
+        delete printableData[i];
+        printableData[i] = nullptr;
+    }
+    delete printableData;
+    printableData = nullptr;
+}
+void Plot::addDataSet(PlotData& plot){
+    dataSets.push_back(plot);
 }
 
-void Plot::setRange(std::vector<std::pair<double, double>>& dataSet){
-    if(dataSet.size() == 0){
-        min_y = -1;
-        min_x = -1;
-        max_y = 1;
-        max_x = 1;
+void Plot::setRange(){
+    //x min, max, y min,max
+    auto dataRange = std::make_tuple(__DBL_MAX__,__DBL_MIN__,__DBL_MAX__,__DBL_MIN__);
+    for(PlotData& data : dataSets){
+        auto range = data.getRange();
+        if (std::isnan(std::get<0>(range)))
+            break;
+        if(std::get<0>(range) < std::get<0>(dataRange))
+            std::get<0>(dataRange) = std::get<0>(range);
+        if(std::get<1>(range) > std::get<1>(dataRange))
+            std::get<1>(dataRange) = std::get<1>(range);
+        if(std::get<2>(range) < std::get<2>(dataRange))
+            std::get<2>(dataRange) = std::get<2>(range);
+        if(std::get<3>(range) > std::get<3>(dataRange))
+            std::get<3>(dataRange) = std::get<3>(range);
     }
-    else{
-        auto& element = *dataSet.begin();
-        min_y = element.second;
-        min_x = element.first;
-        max_y = element.second;
-        max_x = element.first;
-    for(const auto& data : dataSet){
-        if (data.first < min_x)
-            min_x = data.first;
-        else if(data.first > max_x)
-            max_x = data.first;
-        if (data.second < min_y)
-            min_y = data.second;
-        else if(data.second > max_y)
-            max_y = data.second;
-        }
-    }//add some space for specific cases
-    if(min_x == max_x){
-        min_x -= 1.0;
-        max_x += 1.0;
-    }
-    if(min_y == max_y){
-        min_y -= 1.0;
-        max_y += 1.0;
-    }
+    min_x = std::get<0>(dataRange);
+    max_x = std::get<1>(dataRange);
+    min_y = std::get<2>(dataRange);
+    max_y = std::get<3>(dataRange);
 }
 
-char** Plot::createChart(std::vector<std::pair<double, double>>& dataSet){
-    setRange(dataSet);
-    std::pair<double,double> range;
+
+void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
     //calculate visible value range, set limits
-    switch (scale)
-    {
-    case Scale::AlignToX:
-        range = valueRange_scalex();
-        break;
-    case Scale::AlignToY:
-        range = valueRange_scaley();
-        break;    
-    default:
-        range = valueRange_stretch();
-        break;
+    if (Xrange.first > Xrange.second || Yrange.first > Yrange.second)
+        switch (scale)
+        {
+        case Scale::AlignToX:
+            valueRange_scalex();
+            break;
+        case Scale::AlignToY:
+            valueRange_scaley();
+            break;    
+        default:
+            valueRange_stretch();
+            break;
+        }
+    //prefill printable array of chars
+    for(int i = 0; i < windowSize.second; i++){
+        for(int j = 0; j < windowSize.first; j++)
+            printableData[i][j] = ' ';
     }
     //draw chart
-    switch (style)
+    for (PlotData& dataSet : dataSets)
+    switch (dataSet.style)
     {
     case Style::Linear:
-        drawLines(dataSet, range);
+        drawLines(dataSet);
         break;
     default:
-        drawDots(dataSet, range);
+        drawDots(dataSet);
         break;
     }
-    return printableData;
 }
 std::pair<double, double> Plot::valueRange_stretch(){
     //visible range of x axis
@@ -106,7 +96,6 @@ std::pair<double, double> Plot::valueRange_stretch(){
     visible_min_x = min_x;
     visible_max_y = max_y;
     visible_max_x = max_x;
-    return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
 std::pair<double, double> Plot::valueRange_scaley(){
@@ -119,7 +108,6 @@ std::pair<double, double> Plot::valueRange_scaley(){
     visible_min_x = (min_x+max_x)/2 - valueRangeX/2;
     visible_max_y = max_y;
     visible_max_x = visible_min_x + valueRangeX;
-    return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
 
@@ -133,110 +121,164 @@ std::pair<double, double> Plot::valueRange_scalex(){
     visible_min_x = min_x;
     visible_max_y = visible_min_y + valueRangeY;
     visible_max_x = max_x;
-    return std::pair<double,double>(valueRangeX, valueRangeY);
 }
 
-void Plot::drawDots(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
-    //prefill printable array of chars
-    for(int i = 0; i < windowSize.second; i++){
-        for(int j = 0; j < windowSize.first; j++)
-            printableData[i][j] = ' ';
-    }
+void Plot::drawDots(PlotData& DataSet){
+    double visibleRangeX = visible_max_x - visible_min_x;
+    double visibleRangeY = visible_max_y - visible_min_y;
+    
     //asign each element to place in chart
-    for(const auto& data : DataSet){
-        int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
-        int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
+    for(const auto& data : DataSet.getData({visible_min_x, visible_max_x}, {visible_min_x, visible_max_x})){
+        int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
+        int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         //check if in visible range
         if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
-            printableData[y][x] = symbol;
+            printableData[y][x] = DataSet.symbol;
     }
 }
 
-void Plot::drawLines(std::vector<std::pair<double, double>>& DataSet, std::pair<double, double>& range){
-    //was previous point visible
-    bool previous;
-    //prefill printable array of chars
-    for(int i = 0; i < windowSize.second; i++){
-        for(int j = 0; j < windowSize.first; j++)
-            printableData[i][j] = ' ';
-    }
-    //coords for first point skipped in loop
-    std::pair<int,int> previousCoords(
-        static_cast<int>(round((DataSet.begin()->first-visible_min_x)/range.first*(windowSize.first-1))),
-        static_cast<int>(round((DataSet.begin()->second-visible_min_y)/range.second*(windowSize.second-1)))
-    );
-    previous = (previousCoords.first >= 0 && previousCoords.second >= 0 &&
-        previousCoords.first < windowSize.first && previousCoords.second < windowSize.second);
+// void Plot::drawLines(PlotData& plotData){
+//     double visibleRangeX = visible_max_x - visible_min_x;
+//     double visibleRangeY = visible_max_y - visible_min_y;
+//     //coords for first point skipped in loop
+//     auto dataSet = plotData.getData();
+//     std::pair<int,int> previousCoords(
+//         static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
+//         static_cast<int>(round((dataSet.begin()->second-visible_min_y)/visibleRangeY*(windowSize.second-1)))
+//     );
+//     bool previous = previousCoords.first >= 0 && previousCoords.second >= 0 
+//     && previousCoords.first < windowSize.first && previousCoords.second < windowSize.second;
 
-    std::for_each(++DataSet.begin(), DataSet.end(), [&](std::pair<double,double>& data){
-        //coords of new point
-        int y = static_cast<int>(round((data.second-visible_min_y)/range.second*(windowSize.second-1)));
-        int x =static_cast<int>(round((data.first-visible_min_x)/range.first*(windowSize.first-1)));
-        //if old or new is visible draw line
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second || previous)
-            drawLine(previousCoords, {x,y});
-        //new point becomes old
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
-            previous = true;
-        previousCoords = {x,y};
-    });
-}
+//     std::for_each(++dataSet.begin(), dataSet.end(), [&](std::pair<double,double>& data){
+//         //coords of new point
+//         int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
+//         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
+//         if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second || previous)
+//             drawLine(previousCoords, {x,y}, plotData.symbol);
+//         //new point becomes old
+//         if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
+//             previous = true;
+//         previousCoords = {x,y};
+//     });
+// }
 
 
-void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2){
-    //straight line cases
-    if (p1.first == p2.first){
-        for(int i = std::min(p1.second, p2.second); i <= std::max(p1.second, p2.second); i++)
-            if(p1.first >= 0 && p1.first < windowSize.first &&
-            i >= 0 && i < windowSize.second)
-                printableData[i][p1.first] = symbol;
-    }
-    else if (p1.second == p2.second){
-        for(int i = std::min(p1.first, p1.first); i <= std::max(p1.first, p1.first); i++)
-            if(p1.second >= 0 && p1.second < windowSize.second &&
-            i >= 0 && i < windowSize.first)
-                printableData[p1.second][i] = symbol;
-    }
-    else{
-        unsigned x_length = abs(p1.first - p2.first);
-        unsigned y_length = abs(p1.second - p2.second);
-        //pick one providing higher resolution so it fills everything between two points
-        if(x_length > y_length){
-            //y=ax+b
-            double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
-            double b = static_cast<double>(p1.second) - (a*p1.first);
-            int x = std::min(p1.first, p2.first);
-            double y = a*x + b;
-            //put in array if it fits
-            for(x; x <= std::max(p1.first, p2.first); x++ ){
-                if(x >= 0 && x < windowSize.first &&
-                y >= 0 && static_cast<int>(round(y)) < windowSize.second)
-                    printableData[static_cast<int>(round(y))][x] = symbol;
-                y+=a;
-            }
-        }else{
-            //same as above exept with this formula
-            //x = ay + b
-            double a = static_cast<double>(p2.first - p1.first) / (p2.second - p1.second);
-            double b = static_cast<double>(p1.first) - (a*p1.second);
-            int y = std::min(p1.second, p2.second);
-            double x = a*y+b;
-            for(y; y <= std::max(p1.second, p2.second); y++ ){
-                if(x >= 0 && static_cast<int>(round(x)) < windowSize.first &&
-                y >= 0 && y < windowSize.second)
-                    printableData[y][static_cast<int>(round(x))] = symbol;
-                x+=a;
-            }
-        }
-    }
-}
+// void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
+//     //straight line cases
+//     if (p1.first == p2.first){
+//         for(int i = std::min(p1.second, p2.second); i <= std::max(p1.second, p2.second); i++)
+//             if(p1.first >= 0 && p1.first < windowSize.first &&
+//             i >= 0 && i < windowSize.second)
+//                 printableData[i][p1.first] = symbol;
+//     }
+//     else if (p1.second == p2.second){
+//         for(int i = std::min(p1.first, p1.first); i <= std::max(p1.first, p1.first); i++)
+//             if(p1.second >= 0 && p1.second < windowSize.second &&
+//             i >= 0 && i < windowSize.first)
+//                 printableData[p1.second][i] = symbol;
+//     }
+//     else{
+//         unsigned x_length = abs(p1.first - p2.first);
+//         unsigned y_length = abs(p1.second - p2.second);
+//         //pick one providing higher resolution so it fills everything between two points
+//         if(x_length > y_length){
+//             //y=ax+b
+//             double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
+//             double b = static_cast<double>(p1.second) - (a*p1.first);
+//             int x = std::min(p1.first, p2.first);
+//             double y = a*x + b;
+//             //put in array if it fits
+//             for(x; x <= std::max(p1.first, p2.first); x++ ){
+//                 if(x >= 0 && x < windowSize.first &&
+//                 y >= 0 && static_cast<int>(round(y)) < windowSize.second)
+//                     printableData[static_cast<int>(round(y))][x] = symbol;
+//                 y+=a;
+//             }
+//         }else{
+//             //same as above exept with this formula
+//             //x = ay + b
+//             double a = static_cast<double>(p2.first - p1.first) / (p2.second - p1.second);
+//             double b = static_cast<double>(p1.first) - (a*p1.second);
+//             int y = std::min(p1.second, p2.second);
+//             double x = a*y+b;
+//             for(y; y <= std::max(p1.second, p2.second); y++ ){
+//                 if(x >= 0 && static_cast<int>(round(x)) < windowSize.first &&
+//                 y >= 0 && y < windowSize.second)
+//                     printableData[y][static_cast<int>(round(x))] = symbol;
+//                 x+=a;
+//             }
+//         }
+//     }
+// }
 
-//operators
-std::ostream& operator<<(std::ostream& s, const Plot& t){ 
-    for(int i = t.windowSize.second-1; i >= 0; i--){
-        for(int j = 0; j < t.windowSize.first; j++)
-            s << t.printableData[i][j];
-        s << '\n';
-    } 
-    return s;
-}
+// //operators
+// std::ostream& operator<<(std::ostream& s, const Plot& t){ 
+//     for(int i = t.windowSize.second-1; i >= 0; i--){
+//         for(int j = 0; j < t.windowSize.first; j++)
+//             s << t.printableData[i][j];
+//         s << '\n';
+//     } 
+//     return s;
+// }
+// // void Plot::setRange(std::vector<std::pair<double, double>>& dataSet){
+// //     if(dataSet.size() == 0){
+// //         min_y = -1;
+// //         min_x = -1;
+// //         max_y = 1;
+// //         max_x = 1;
+// //     }
+// //     else{
+// //         auto& element = *dataSet.begin();
+// //         min_y = element.second;
+// //         min_x = element.first;
+// //         max_y = element.second;
+// //         max_x = element.first;
+// //     for(const auto& data : dataSet){
+// //         if (data.first < min_x)
+// //             min_x = data.first;
+// //         else if(data.first > max_x)
+// //             max_x = data.first;
+// //         if (data.second < min_y)
+// //             min_y = data.second;
+// //         else if(data.second > max_y)
+// //             max_y = data.second;
+// //         }
+// //     }//add some space for specific cases
+// //     if(min_x == max_x){
+// //         min_x -= 1.0;
+// //         max_x += 1.0;
+// //     }
+// //     if(min_y == max_y){
+// //         min_y -= 1.0;
+// //         max_y += 1.0;
+// //     }
+// // }
+
+// // char** Plot::createChart(std::vector<std::pair<double, double>>& dataSet){
+// //     setRange(dataSet);
+// //     std::pair<double,double> range;
+// //     //calculate visible value range, set limits
+// //     switch (scale)
+// //     {
+// //     case Scale::AlignToX:
+// //         range = valueRange_scalex();
+// //         break;
+// //     case Scale::AlignToY:
+// //         range = valueRange_scaley();
+// //         break;    
+// //     default:
+// //         range = valueRange_stretch();
+// //         break;
+// //     }
+// //     //draw chart
+// //     switch (style)
+// //     {
+// //     case Style::Linear:
+// //         drawLines(dataSet, range);
+// //         break;
+// //     default:
+// //         drawDots(dataSet, range);
+// //         break;
+// //     }
+// //     return printableData;
+// // }
