@@ -137,27 +137,20 @@ void Plot::drawDots(PlotData& DataSet){
     }
 }
 
-//TODO: lines that only go through the visible range are not there
 void Plot::drawLines(PlotData& plotData){
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
-    //coords for first point skipped in loop
+    //coords for first point
     auto& dataSet = plotData.getData();
     std::pair<int,int> previousCoords(
         static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
         static_cast<int>(round((dataSet.begin()->second-visible_min_y)/visibleRangeY*(windowSize.second-1)))
-    );
-    bool previous = false;
-
+    );  
     for(std::pair<double,double>& data : dataSet){
-        //coords of new point
         int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second || previous)
             drawLine(previousCoords, {x,y}, plotData.symbol);
         //new point becomes old
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
-            previous = true;
         previousCoords = {x,y};
     }
 }
@@ -185,13 +178,21 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
             //y=ax+b
             double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
             double b = static_cast<double>(p1.second) - (a*p1.first);
-            int x = std::min(p1.first, p2.first);
-            double y = a*x + b;
+            double XlowerLimit;
+            double XupperLimit;
+            if(a > 0){
+                XlowerLimit = -b/a;
+                XupperLimit = (windowSize.second -1 - b)/a;
+            }else{
+                XlowerLimit = (windowSize.second -1 - b)/a;
+                XupperLimit = -b/a;
+            }
+            int XlowerCoord = std::max(std::max( 0, static_cast<int>(round(XlowerLimit))), std::min(p1.first, p2.first));
+            int XupperCoord = std::min( std::min(static_cast<int>(windowSize.first -1), static_cast<int>(round(XupperLimit))), std::max(p1.first, p2.first));
+            double y = a*XlowerCoord + b;
             //put in array if it fits
-            for(x; x <= std::max(p1.first, p2.first); x++ ){
-                if(x >= 0 && x < windowSize.first &&
-                y >= 0 && static_cast<int>(round(y)) < windowSize.second)
-                    printableData[static_cast<int>(round(y))][x] = symbol;
+            while(XlowerCoord <= XupperCoord){
+                    printableData[static_cast<int>(round(y))][XlowerCoord++] = symbol;
                 y+=a;
             }
         }else{
@@ -199,17 +200,27 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
             //x = ay + b
             double a = static_cast<double>(p2.first - p1.first) / (p2.second - p1.second);
             double b = static_cast<double>(p1.first) - (a*p1.second);
-            int y = std::min(p1.second, p2.second);
-            double x = a*y+b;
-            for(y; y <= std::max(p1.second, p2.second); y++ ){
-                if(x >= 0 && static_cast<int>(round(x)) < windowSize.first &&
-                y >= 0 && y < windowSize.second)
-                    printableData[y][static_cast<int>(round(x))] = symbol;
+            double YlowerLimit;
+            double YupperLimit;
+            if(a > 0){
+                YlowerLimit = -b/a;
+                YupperLimit = (windowSize.first -1 - b)/a;
+            }else{
+                YlowerLimit = (windowSize.first -1 - b)/a;
+                YupperLimit = -b/a;
+            }
+            int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.first, p2.first));
+            int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.first, p2.first));
+            double x = a*YlowerCoord + b;
+            //put in array if it fits
+            while(YlowerCoord <= YupperCoord){
+                    printableData[YlowerCoord++][static_cast<int>(round(x))] = symbol;
                 x+=a;
             }
         }
     }
 }
+
 
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 

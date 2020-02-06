@@ -63,7 +63,7 @@ public:
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& DataSet);
     //Draw line between p1 and p2, no safety pass correct args
-    void drawLine(std::pair<int, int> p1, std::pair<int, int> p2, char symbol);
+    void drawLine(std::pair<int,int> p1, std::pair<int,int> p2, char symbol);
     void addDataSet(PlotData& plot);
 
     
