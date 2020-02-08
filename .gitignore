@@ -5,3 +5,4 @@ Main
 *.o
 .vscode/*
 main.cpp
+main

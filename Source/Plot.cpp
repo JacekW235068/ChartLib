@@ -86,7 +86,7 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
         break;
     }
 }
-std::pair<double, double> Plot::valueRange_stretch(){
+void Plot::valueRange_stretch(){
     //visible range of x axis
     double valueRangeX = abs(max_x - min_x);
     //visible range of y axis
@@ -98,7 +98,7 @@ std::pair<double, double> Plot::valueRange_stretch(){
     visible_max_x = max_x;
 }
 
-std::pair<double, double> Plot::valueRange_scaley(){
+void Plot::valueRange_scaley(){
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
     //y range per cell (with cell aspect ratio included) * X cells
@@ -111,7 +111,7 @@ std::pair<double, double> Plot::valueRange_scaley(){
 }
 
 
-std::pair<double, double> Plot::valueRange_scalex(){
+void Plot::valueRange_scalex(){
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
     //x range per cell  * y cells (with cell aspect ratio included)
@@ -140,8 +140,8 @@ void Plot::drawDots(PlotData& DataSet){
 void Plot::drawLines(PlotData& plotData){
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
-    //coords for first point
     auto& dataSet = plotData.getData();
+    //coords for first point
     std::pair<int,int> previousCoords(
         static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
         static_cast<int>(round((dataSet.begin()->second-visible_min_y)/visibleRangeY*(windowSize.second-1)))
@@ -149,7 +149,7 @@ void Plot::drawLines(PlotData& plotData){
     for(std::pair<double,double>& data : dataSet){
         int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-            drawLine(previousCoords, {x,y}, plotData.symbol);
+        drawLine(previousCoords, {x,y}, plotData.symbol);
         //new point becomes old
         previousCoords = {x,y};
     }
@@ -157,27 +157,39 @@ void Plot::drawLines(PlotData& plotData){
 
 
 void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
-    //straight line cases
+    //straight line X
     if (p1.first == p2.first){
-        for(int i = std::min(p1.second, p2.second); i <= std::max(p1.second, p2.second); i++)
-            if(p1.first >= 0 && p1.first < windowSize.first &&
-            i >= 0 && i < windowSize.second)
-                printableData[i][p1.first] = symbol;
+        //is line in visible field?
+        if (p1.first >= 0 && p1.first < windowSize.first){
+            //draw line from low limit to high limit (limits include max window height)
+            int YlowwerCoords = std::max(0, std::min(p1.second, p2.second));
+            int YupperCoords = std::min(static_cast<int>(windowSize.second-1), std::max(p1.second, p2.second));
+            while (YlowwerCoords <= YupperCoords){
+                printableData[YlowwerCoords][p1.first] = symbol;
+                YlowwerCoords ++;
+            } 
+        }
     }
+    //Same but on y
     else if (p1.second == p2.second){
-        for(int i = std::min(p1.first, p1.first); i <= std::max(p1.first, p1.first); i++)
-            if(p1.second >= 0 && p1.second < windowSize.second &&
-            i >= 0 && i < windowSize.first)
-                printableData[p1.second][i] = symbol;
+        if (p1.second >= 0 && p1.second < windowSize.second){
+            int XlowwerCoords = std::max(0, std::min(p1.first, p2.first));
+            int XupperCoords = std::min(static_cast<int>(windowSize.first-1), std::max(p1.first, p2.first));
+            while (XlowwerCoords <= XupperCoords){
+                printableData[p1.second][XlowwerCoords] = symbol;
+                XlowwerCoords ++;
+            }
+        } 
     }
     else{
         unsigned x_length = abs(p1.first - p2.first);
         unsigned y_length = abs(p1.second - p2.second);
-        //pick one providing higher resolution so it fills everything between two points
+        //pick one with higher 'resolution' so it fills everything between two points
         if(x_length > y_length){
             //y=ax+b
             double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
             double b = static_cast<double>(p1.second) - (a*p1.first);
+            //set limit for drawed line
             double XlowerLimit;
             double XupperLimit;
             if(a > 0){
@@ -187,10 +199,11 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
                 XlowerLimit = (windowSize.second -1 - b)/a;
                 XupperLimit = -b/a;
             }
+            //compare calculated limits with visible window limits and point start,end coords
             int XlowerCoord = std::max(std::max( 0, static_cast<int>(round(XlowerLimit))), std::min(p1.first, p2.first));
             int XupperCoord = std::min( std::min(static_cast<int>(windowSize.first -1), static_cast<int>(round(XupperLimit))), std::max(p1.first, p2.first));
+            //y calculated as function of x
             double y = a*XlowerCoord + b;
-            //put in array if it fits
             while(XlowerCoord <= XupperCoord){
                     printableData[static_cast<int>(round(y))][XlowerCoord++] = symbol;
                 y+=a;
@@ -212,7 +225,6 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
             int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.first, p2.first));
             int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.first, p2.first));
             double x = a*YlowerCoord + b;
-            //put in array if it fits
             while(YlowerCoord <= YupperCoord){
                     printableData[YlowerCoord++][static_cast<int>(round(x))] = symbol;
                 x+=a;
