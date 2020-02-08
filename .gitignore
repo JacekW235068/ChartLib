@@ -6,3 +6,4 @@ Main
 .vscode/*
 main.cpp
 main
+*.a

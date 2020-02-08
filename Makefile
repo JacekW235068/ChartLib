@@ -1,12 +1,19 @@
-Main: main.cpp Plot.o PlotData.o PlotDataSet.o
-	g++ -g main.cpp Plot.o PlotData.o PlotDataSet.o -o Main
+CC=g++
 
 
-Plot.o: ./Source/Plot.cpp
-	g++ -g -c ./Source/Plot.cpp  -o Plot.o
+Debug: main.cpp chartLib.a
+	$(CC) -g main.cpp chartLib.a -o Main
 
-PlotData.o: ./Source/PlotData.cpp
-	g++ -g -c ./Source/PlotData.cpp  -o PlotData.o
+static: chartLib.a clean
 
-PlotDataSet.o: ./Source/PlotDataSet.cpp
-	g++ -g -c ./Source/PlotDataSet.cpp  -o PlotDataSet.o
+chartLib.a:  Plot.o PlotData.o PlotDataSet.o
+	ar rs chartLib.a Plot.o PlotData.o PlotDataSet.o
+
+%.o: ./Source/%.cpp ./Header/%.hpp
+	$(CC) -g -c -o $@ $<
+
+clean:
+	rm -rf *.o  main Main
+
+clean-all:
+	rm -rf *.o *.a main Main
