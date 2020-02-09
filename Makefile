@@ -1,19 +1,26 @@
 CC=g++
-
+CC_FLAGS=-g -c
 
 Debug: main.cpp chartLib.a
-	$(CC) -g main.cpp chartLib.a -o Main
+	@echo "Kompilacja kodu źródłowego z wykorzystaniem $(CC)..."
+	@$(CC) -g main.cpp chartLib.a -o Main
+	@echo "Done."
 
 static: chartLib.a clean
+	@echo "Generowanie biblioteki staticznej..."
 
 chartLib.a:  Plot.o PlotData.o PlotDataSet.o
-	ar rs chartLib.a Plot.o PlotData.o PlotDataSet.o
+	@echo "Generowanie archiwum..."
+	@ar rs chartLib.a Plot.o PlotData.o PlotDataSet.o
 
 %.o: ./Source/%.cpp ./Header/%.hpp
-	$(CC) -g -c -o $@ $<
+	@echo "Kompilowanie pliku $< do $@... ( $(CC) $(CC_FLAGS) )" 
+	@$(CC) $(CC_FLAGS) -o $@ $<
 
 clean:
-	rm -rf *.o  main Main
+	@echo "Czyszczenie wszystkich plików obiektowych, main, oraz Main..."
+	@rm -rf *.o  main Main
 
 clean-all:
-	rm -rf *.o *.a main Main
+	@echo "Czyszczenie wszystkich plików obiektowych, archiwalnych, main, oraz Main..."
+	@rm -rf *.o *.a main Main
