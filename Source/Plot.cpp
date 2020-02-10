@@ -17,6 +17,8 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];   
     }
+    void setRange();
+    void createChart(std::pair<double,double> Xrange = {1,-1}, std::pair<double,double> Yrange = {1,-1});
 }
 Plot::~Plot()
 {
