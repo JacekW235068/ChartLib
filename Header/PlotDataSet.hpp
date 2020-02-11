@@ -9,8 +9,9 @@
 
 class PlotDataSet : public PlotData
 {
-public: 
+private:
     std::list<std::pair<double, double>> dataSet;
+public:
     PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol = 'o', Style Style = Style::dots);
     std::tuple<double,double,double,double> getRange() const;
     std::list<std::pair<double,double>>& getData();

@@ -42,7 +42,6 @@ private:
     //METHODS
     //find min/max X/Y
     void setRange();
-    void createChart(std::pair<double,double> Xrange = {1,-1}, std::pair<double,double> Yrange = {1,-1});
     //scaling methods, sets visible range
     void valueRange_scalex();
     void valueRange_scaley();
@@ -56,12 +55,12 @@ private:
 public:
 
     //OPTIONS MODIFICATION
-    void setOptions(std::pair<unsigned, unsigned> WindowSize);
-    void setOptions(double CellAspectRatio);
-    void setOptions(Scale Scale);
-    void setOptions(std::pair<unsigned, unsigned> WindowSize, Scale Scale);
-    void setOptions(std::pair<unsigned, unsigned> WindowSize, double CellAspectRatio);
-    void setOptions(std::pair<unsigned, unsigned> WindowSize, Scale Scale, double CellAspectRatio);
+    //Requires Recreating chart!!!
+    void setWindowSize(std::pair<unsigned, unsigned> WindowSize);
+    //Requires Recreating chart!!!
+    void setCellAspectratio(double CellAspectRatio);
+    //Requires Recreating chart!!!
+    void setScaling(Scale Scale);
 
     //OPTIONS ACCESS
     std::pair<unsigned, unsigned> getWindowSize();
@@ -77,6 +76,7 @@ public:
     ~Plot();
 
     //METHODS
+    void createChart(std::pair<double,double> Xrange = {1,-1}, std::pair<double,double> Yrange = {1,-1});
     //Draw line between p1 and p2
     void drawLine(std::pair<int,int> p1, std::pair<int,int> p2, char symbol);
     void addDataSet(PlotData& plot);
