@@ -17,6 +17,7 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];   
     }
+    setRange();
 }
 Plot::~Plot()
 {
@@ -29,6 +30,7 @@ Plot::~Plot()
 }
 void Plot::addDataSet(PlotData& plot){
     dataSets.push_back(plot);
+    setRange();
 }
 
 void Plot::setRange(){
@@ -222,8 +224,8 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
                 YlowerLimit = (windowSize.first -1 - b)/a;
                 YupperLimit = -b/a;
             }
-            int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.first, p2.first));
-            int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.first, p2.first));
+            int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.second, p2.second));
+            int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
                     printableData[YlowerCoord++][static_cast<int>(round(x))] = symbol;
@@ -232,6 +234,39 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
         }
     }
 }
+
+//DATA ACCESS AND MODIFICATION
+std::pair<unsigned, unsigned> Plot::getWindowSize(){
+    return windowSize;
+}
+double Plot::getCellAspectRation(){
+    return cellAspectRatio;
+}
+Scale Plot::getScaling(){
+    return scale;
+}
+
+void Plot::setWindowSize(std::pair<unsigned, unsigned> WindowSize){
+    for(int i = 0; i < windowSize.second; i++){
+        printableData[i] = nullptr;
+    }
+    delete printableData;
+    windowSize = WindowSize;
+    printableData = new char*[windowSize.second];
+    for(int i = 0; i < windowSize.second; i++){
+        printableData[i] = new char[windowSize.first];   
+    }
+
+}
+void Plot::setCellAspectratio(double CellAspectRatio){
+    cellAspectRatio = CellAspectRatio;
+
+}
+void Plot::setScaling(Scale Scale){
+    scale = Scale;
+
+}
+
 
 
 //operators
