@@ -1,15 +1,16 @@
 CXXFLAGS=
 OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
-all:	compile
+all:	static
  
 debug: CXXFLAGS+= -DDEBUG -g
-debug: compile
+debug: exec
 
-compile: main.cpp chartLib.a
+exec: 	main.cpp chartLib.a
 	@echo "Compiling using $(CXX)..."
 	@$(CXX) $(CXXFLAGS) main.cpp chartLib.a -o Main
 	@echo "Done."
+
 
 static: chartLib.a
 	@echo "Done."
