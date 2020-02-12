@@ -40,11 +40,9 @@ private:
     
 
     //METHODS
-    //find min/max X/Y
-    void setRange();
     //scaling methods, sets visible range
-    void valueRange_scalex();
-    void valueRange_scaley();
+    void valueRange_scalex(double center);
+    void valueRange_scaley(double center);
     void valueRange_stretch();
     //Style methods, "draws" symbol onto printable data
     void drawDots(PlotData& DataSet);
@@ -76,7 +74,8 @@ public:
     ~Plot();
 
     //METHODS
-    void createChart(std::pair<double,double> Xrange = {1,-1}, std::pair<double,double> Yrange = {1,-1});
+    void createChart(double center = nan(""));
+    void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
     //Draw line between p1 and p2
     void drawLine(std::pair<int,int> p1, std::pair<int,int> p2, char symbol);
     void addDataSet(PlotData& plot);
