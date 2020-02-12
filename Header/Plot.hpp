@@ -28,6 +28,10 @@ private:
     //char symbol;
     std::list<std::reference_wrapper<PlotData>> dataSets;
     //range of chart
+    double min_y;
+    double min_x;
+    double max_y;
+    double max_x;
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
@@ -37,8 +41,8 @@ private:
 
     //METHODS
     //scaling methods, sets visible range
-    void valueRange_scalex();
-    void valueRange_scaley();
+    void valueRange_scalex(double center);
+    void valueRange_scaley(double center);
     void valueRange_stretch();
     //Style methods, "draws" symbol onto printable data
     void drawDots(PlotData& DataSet);
@@ -70,7 +74,8 @@ public:
     ~Plot();
 
     //METHODS
-    void createChart(std::pair<double,double> Xrange = {1,-1}, std::pair<double,double> Yrange = {1,-1});
+    void createChart(double center = nan(""));
+    void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
     //Draw line between p1 and p2
     void drawLine(std::pair<int,int> p1, std::pair<int,int> p2, char symbol);
     void addDataSet(PlotData& plot);
