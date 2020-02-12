@@ -1,26 +1,36 @@
-CC=g++
-CC_FLAGS=-g -c
+CXXFLAGS=
+OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
-Debug: main.cpp chartLib.a
-	@echo "Kompilacja kodu źródłowego z wykorzystaniem $(CC)..."
-	@$(CC) -g main.cpp chartLib.a -o Main
+all:	compile
+ 
+debug: CXXFLAGS+= -DDEBUG -g
+debug: compile
+
+compile: main.cpp chartLib.a
+	@echo "Compiling using $(CXX)..."
+	@$(CXX) $(CXXFLAGS) main.cpp chartLib.a -o Main
 	@echo "Done."
 
-static: chartLib.a clean
-	@echo "Generowanie biblioteki staticznej..."
+static: chartLib.a
+	@echo "Done."
 
-chartLib.a:  Plot.o PlotData.o PlotDataSet.o
-	@echo "Generowanie archiwum..."
-	@ar rs chartLib.a Plot.o PlotData.o PlotDataSet.o
+chartLib.a: $(OBJFILES)
+	@echo "Archiving files: $(OBJFILES)"
+	@ar vrs chartLib.a obj/*.o
+
 
 %.o: ./Source/%.cpp ./Header/%.hpp
-	@echo "Kompilowanie pliku $< do $@... ( $(CC) $(CC_FLAGS) )" 
-	@$(CC) $(CC_FLAGS) -o $@ $<
+	@echo "Compiling file $< to obj/$@... ( $(CXX) $(CXXFLAGS) )" 
+	@$(CXX) -c -o obj/$@ $<
 
-clean:
-	@echo "Czyszczenie wszystkich plików obiektowych, main, oraz Main..."
-	@rm -rf *.o  main Main
+clean-main:	
+	@echo "Removing exec Main..."
+	@rm -rf Main
 
-clean-all:
-	@echo "Czyszczenie wszystkich plików obiektowych, archiwalnych, main, oraz Main..."
-	@rm -rf *.o *.a main Main
+clean-obj:  
+	@echo "Removing all objective files..."
+	@rm -rf obj/*.o
+
+clean-all: clean-main clean-obj
+	@echo "Removing dynamic library..."
+	@rm -rf chartLib.a
