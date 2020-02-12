@@ -9,7 +9,7 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     ) :
     windowSize(WindowSize),
     scale(Scale),
-    cellAspectRatio(CellAspectRatio) 
+    cellAspectRatio(CellAspectRatio)
 {
     dataSets = std::list<std::reference_wrapper<PlotData>>();
     //create array of chars for chart  
@@ -17,7 +17,6 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     for(int i = 0; i < windowSize.second; i++){
         printableData[i] = new char[windowSize.first];   
     }
-    setRange();
 }
 Plot::~Plot()
 {
@@ -30,30 +29,9 @@ Plot::~Plot()
 }
 void Plot::addDataSet(PlotData& plot){
     dataSets.push_back(plot);
-    setRange();
 }
 
-void Plot::setRange(){
-    //x min, max, y min,max
-    auto dataRange = std::make_tuple(__DBL_MAX__,__DBL_MIN__,__DBL_MAX__,__DBL_MIN__);
-    for(PlotData& data : dataSets){
-        auto range = data.getRange();
-        if (std::isnan(std::get<0>(range)))
-            break;
-        if(std::get<0>(range) < std::get<0>(dataRange))
-            std::get<0>(dataRange) = std::get<0>(range);
-        if(std::get<1>(range) > std::get<1>(dataRange))
-            std::get<1>(dataRange) = std::get<1>(range);
-        if(std::get<2>(range) < std::get<2>(dataRange))
-            std::get<2>(dataRange) = std::get<2>(range);
-        if(std::get<3>(range) > std::get<3>(dataRange))
-            std::get<3>(dataRange) = std::get<3>(range);
-    }
-    min_x = std::get<0>(dataRange);
-    max_x = std::get<1>(dataRange);
-    min_y = std::get<2>(dataRange);
-    max_y = std::get<3>(dataRange);
-}
+
 
 
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
@@ -89,6 +67,20 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
     }
 }
 void Plot::valueRange_stretch(){
+    double min_x =__DBL_MAX__,max_x = __DBL_MIN__,min_y = __DBL_MAX__, max_y = __DBL_MIN__;
+    for(PlotData& data : dataSets){
+        auto range = data.getRange();
+        if (std::isnan(std::get<0>(range)))
+            break;
+        if(std::get<0>(range) < min_x)
+            min_x = std::get<0>(range);
+        if(std::get<1>(range) > max_x)
+            max_x = std::get<1>(range);
+        if(std::get<2>(range) < min_y)
+            min_y = std::get<2>(range);
+        if(std::get<3>(range) > max_y)
+            max_y = std::get<3>(range);
+    }
     //visible range of x axis
     double valueRangeX = abs(max_x - min_x);
     //visible range of y axis
@@ -101,6 +93,20 @@ void Plot::valueRange_stretch(){
 }
 
 void Plot::valueRange_scaley(){
+    double min_x =__DBL_MAX__,max_x = __DBL_MIN__,min_y = __DBL_MAX__, max_y = __DBL_MIN__;
+    for(PlotData& data : dataSets){
+        auto range = data.getRange();
+        if (std::isnan(std::get<0>(range)))
+            break;
+        if(std::get<0>(range) < min_x)
+            min_x = std::get<0>(range);
+        if(std::get<1>(range) > max_x)
+            max_x = std::get<1>(range);
+        if(std::get<2>(range) < min_y)
+            min_y = std::get<2>(range);
+        if(std::get<3>(range) > max_y)
+            max_y = std::get<3>(range);
+    }
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
     //y range per cell (with cell aspect ratio included) * X cells
@@ -114,6 +120,20 @@ void Plot::valueRange_scaley(){
 
 
 void Plot::valueRange_scalex(){
+    double min_x =__DBL_MAX__,max_x = __DBL_MIN__,min_y = __DBL_MAX__, max_y = __DBL_MIN__;
+    for(PlotData& data : dataSets){
+        auto range = data.getRange();
+        if (std::isnan(std::get<0>(range)))
+            break;
+        if(std::get<0>(range) < min_x)
+            min_x = std::get<0>(range);
+        if(std::get<1>(range) > max_x)
+            max_x = std::get<1>(range);
+        if(std::get<2>(range) < min_y)
+            min_y = std::get<2>(range);
+        if(std::get<3>(range) > max_y)
+            max_y = std::get<3>(range);
+    }
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
     //x range per cell  * y cells (with cell aspect ratio included)

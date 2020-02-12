@@ -28,10 +28,6 @@ private:
     //char symbol;
     std::list<std::reference_wrapper<PlotData>> dataSets;
     //range of chart
-    double min_y;
-    double min_x;
-    double max_y;
-    double max_x;
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
@@ -40,8 +36,6 @@ private:
     
 
     //METHODS
-    //find min/max X/Y
-    void setRange();
     //scaling methods, sets visible range
     void valueRange_scalex();
     void valueRange_scaley();
