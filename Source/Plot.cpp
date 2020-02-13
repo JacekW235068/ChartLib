@@ -118,17 +118,31 @@ void Plot::valueRange_stretch(){
     visible_min_x = min_x;
     visible_max_y = max_y;
     visible_max_x = max_x;
+    // single point/straight line scenario
+    if(min_y == max_y){
+        visible_max_y += 0.5;
+        visible_min_y -= 0.5;
+    }
+    if(min_x == max_x){
+        visible_max_x += 0.5;
+        visible_min_x -= 0.5;
+    }
 }
 
 void Plot::valueRange_scaley(double center){
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
+    visible_min_y = min_y;
+    visible_max_y = max_y;
+    // single point/straight line scenario
+    if(valueRangeY == 0){
+        visible_min_y -= 0.5;
+        visible_max_y += 0.5;
+        valueRangeY = 1.0;
+    }
     //y range per cell (with cell aspect ratio included) * X cells
     double valueRangeX = valueRangeY/(windowSize.second)*windowSize.first*cellAspectRatio;
-    //set limits
-    visible_min_y = min_y;
     visible_min_x = center - valueRangeX/2;
-    visible_max_y = max_y;
     visible_max_x = center + valueRangeX/2;
 }
 
@@ -136,13 +150,19 @@ void Plot::valueRange_scaley(double center){
 void Plot::valueRange_scalex(double center){
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
+    visible_min_x = min_x;
+    visible_max_x = max_x;
+    // single point/straight line scenario
+    if(valueRangeX == 0){
+        visible_min_x -= 0.5;
+        visible_max_x += 0.5;
+        valueRangeX = 1.0;
+    }
     //x range per cell  * y cells (with cell aspect ratio included)
     double valueRangeY = valueRangeX/(windowSize.first*cellAspectRatio)*windowSize.second;
     //set limits
     visible_min_y = center - valueRangeY/2;
-    visible_min_x = min_x;
     visible_max_y = center + valueRangeY/2;
-    visible_max_x = max_x;
 }
 
 void Plot::drawDots(PlotData& DataSet){
@@ -340,7 +360,23 @@ void Plot::DataModified(std::tuple<double,double,double,double> rangeBefore, std
         max_y = std::get<3>(rangeAfter);
 }
 void Plot::setRange(){
-    ;
+    min_x = __DBL_MAX__;
+    min_y = __DBL_MAX__;
+    max_x = __DBL_MIN__;
+    max_y = __DBL_MIN__;
+    for(PlotData& data : dataSets){
+        auto range = data.getRange();
+        if (std::isnan(std::get<0>(range)))
+            break;
+        if(std::get<0>(range) < min_x)
+            min_x = std::get<0>(range);
+        if(std::get<1>(range) > max_x)
+            max_x = std::get<1>(range);
+        if(std::get<2>(range) < min_y)
+            min_y = std::get<2>(range);
+        if(std::get<3>(range) > max_y)
+            max_y = std::get<3>(range);
+    }
 }
 
 //operators
