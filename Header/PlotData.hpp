@@ -15,5 +15,6 @@ public:
     virtual std::list<std::pair<double,double>>& getData() = 0;
     virtual std::list<std::pair<double,double>> getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const = 0;
     PlotData(char Symbol = 'o', Style Style = Style::dots);
+    PlotData(const PlotData& plot) = delete; //not sure if it does anything but just keeping it as temporary check for copying
 };
  

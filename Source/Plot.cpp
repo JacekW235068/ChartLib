@@ -287,7 +287,61 @@ void Plot::setScaling(Scale Scale){
 
 }
 
-
+void Plot::RemoveData(PlotData& removed){
+    //remove from reference list
+    dataSets.remove_if([&removed](PlotData& data){
+        return (&data == &removed);
+    });
+    auto removedRange = removed.getRange();
+    //If its possible that chart range was defined by remved dataset range, find new chart range
+    if(std::get<0>(removedRange) == min_x){
+        setRange();
+        return;
+    }
+    if(std::get<1>(removedRange) == max_x){
+        setRange();
+        return;
+    }
+    if(std::get<2>(removedRange) == min_y){
+        setRange();
+        return;
+    }
+    if(std::get<3>(removedRange) == min_y){
+        setRange();
+        return;
+    }
+}
+void Plot::DataModified(std::tuple<double,double,double,double> rangeBefore, std::tuple<double,double,double,double> rangeAfter){
+    if(std::isnan(std::get<0>(rangeAfter))){
+        setRange();
+        return;
+    }
+    //if dataset defined chart range in past new range should be calculated
+    if(std::get<0>(rangeBefore) == min_x && std::get<0>(rangeAfter) < min_x){
+        setRange();
+        return;}
+    if(std::get<1>(rangeBefore) == max_x && std::get<1>(rangeAfter) > max_x){
+        setRange();
+        return;}
+    if(std::get<2>(rangeBefore) == min_y && std::get<2>(rangeAfter) < min_y){
+        setRange();
+        return;}
+    if(std::get<3>(rangeBefore) == max_y && std::get<3>(rangeAfter)>max_y){
+        setRange();
+        return;}
+    //if new dataset range exceeds old char range, it should be updated
+    if(std::get<0>(rangeAfter) < min_x)
+        min_x = std::get<0>(rangeAfter);
+    if(std::get<1>(rangeAfter) > max_x)
+        max_x = std::get<1>(rangeAfter);
+    if(std::get<2>(rangeAfter) < min_y)
+        min_y = std::get<2>(rangeAfter);
+    if(std::get<3>(rangeAfter) > max_y)
+        max_y = std::get<3>(rangeAfter);
+}
+void Plot::setRange(){
+    ;
+}
 
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 

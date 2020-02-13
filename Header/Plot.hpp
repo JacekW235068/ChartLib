@@ -48,8 +48,10 @@ private:
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& DataSet);
 
-
-    
+    //ATTECTION: SCETCHY AS FUCK
+    void setRange();
+    //DataModification
+    void DataModified(std::tuple<double,double,double,double> rangeBefore, std::tuple<double,double,double,double> rangeAfter);
 public:
 
     //OPTIONS MODIFICATION
@@ -59,7 +61,7 @@ public:
     void setCellAspectratio(double CellAspectRatio);
     //Requires Recreating chart!!!
     void setScaling(Scale Scale);
-
+    void RemoveData(PlotData& removed);
     //OPTIONS ACCESS
     std::pair<unsigned, unsigned> getWindowSize();
     double getCellAspectRation();
