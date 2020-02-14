@@ -1,10 +1,14 @@
+
 CXXFLAGS=-std=c++1z
+
 OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
 all:	static
  
+
 .PHONY: clean-main clean-obj create_dir clean_all
 .IGNORE: create_dir 
+
 debug: CXXFLAGS+= -DDEBUG -g
 debug: exec
 
@@ -24,6 +28,7 @@ chartLib.a: create_dir $(OBJFILES)
 
 create_dir: 
 	@mkdir -vp obj
+  
 %.o: ./Source/%.cpp ./Header/%.hpp
 	@echo "Compiling file $< to obj/$@... ( $(CXX) $(CXXFLAGS) )" 
 	@$(CXX) -c -o obj/$@ $<

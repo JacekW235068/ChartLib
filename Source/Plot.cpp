@@ -9,7 +9,12 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     ) :
     windowSize(WindowSize),
     scale(Scale),
-    cellAspectRatio(CellAspectRatio) 
+    cellAspectRatio(CellAspectRatio),
+    min_x(__DBL_MAX__),
+    max_x(__DBL_MIN__),
+    min_y(__DBL_MAX__),
+    max_y(__DBL_MIN__)
+
 {
     dataSets = std::list<std::reference_wrapper<PlotData>>();
     //create array of chars for chart  
@@ -29,46 +34,67 @@ Plot::~Plot()
 }
 void Plot::addDataSet(PlotData& plot){
     dataSets.push_back(plot);
+    auto range = plot.getRange();
+    if (std::isnan(std::get<0>(range)))
+    return;
+    if(std::get<0>(range) < min_x)
+        min_x = std::get<0>(range);
+    if(std::get<1>(range) > max_x)
+        max_x = std::get<1>(range);
+    if(std::get<2>(range) < min_y)
+        min_y = std::get<2>(range);
+    if(std::get<3>(range) > max_y)
+        max_y = std::get<3>(range);
+    
 }
 
-void Plot::setRange(){
-    //x min, max, y min,max
-    auto dataRange = std::make_tuple(__DBL_MAX__,__DBL_MIN__,__DBL_MAX__,__DBL_MIN__);
-    for(PlotData& data : dataSets){
-        auto range = data.getRange();
-        if (std::isnan(std::get<0>(range)))
-            break;
-        if(std::get<0>(range) < std::get<0>(dataRange))
-            std::get<0>(dataRange) = std::get<0>(range);
-        if(std::get<1>(range) > std::get<1>(dataRange))
-            std::get<1>(dataRange) = std::get<1>(range);
-        if(std::get<2>(range) < std::get<2>(dataRange))
-            std::get<2>(dataRange) = std::get<2>(range);
-        if(std::get<3>(range) > std::get<3>(dataRange))
-            std::get<3>(dataRange) = std::get<3>(range);
+
+void Plot::createChart(double center){
+    //calculate visible value range, set limits
+    
+
+    switch (scale)
+    {
+    case Scale::AlignToX:
+        if (std::isnan(center))
+            center = (max_y+min_y)/2;
+        valueRange_scalex(center);
+        break;
+    case Scale::AlignToY:
+        if (std::isnan(center))
+            center = (max_x+min_x)/2;
+        valueRange_scaley(center);
+        break;    
+    default:
+        valueRange_stretch();
+        break;
     }
-    min_x = std::get<0>(dataRange);
-    max_x = std::get<1>(dataRange);
-    min_y = std::get<2>(dataRange);
-    max_y = std::get<3>(dataRange);
+    //prefill printable array of chars
+    for(int i = 0; i < windowSize.second; i++){
+        for(int j = 0; j < windowSize.first; j++)
+            printableData[i][j] = ' ';
+    }
+    //draw chart
+    for (PlotData& dataSet : dataSets)
+    switch (dataSet.style)
+    {
+    case Style::Linear:
+        drawLines(dataSet);
+        break;
+    default:
+        drawDots(dataSet);
+        break;
+    }
 }
-
 
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
     //calculate visible value range, set limits
-    if (Xrange.first > Xrange.second || Yrange.first > Yrange.second)
-        switch (scale)
-        {
-        case Scale::AlignToX:
-            valueRange_scalex();
-            break;
-        case Scale::AlignToY:
-            valueRange_scaley();
-            break;    
-        default:
-            valueRange_stretch();
-            break;
-        }
+    if (Xrange.first >= Xrange.second || Yrange.first >= Yrange.second)
+        return; //should propably throw here
+    visible_min_x = Xrange.first;
+    visible_max_x = Xrange.second;
+    visible_min_y = Yrange.first;
+    visible_max_y = Yrange.second;
     //prefill printable array of chars
     for(int i = 0; i < windowSize.second; i++){
         for(int j = 0; j < windowSize.first; j++)
@@ -87,10 +113,6 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
     }
 }
 void Plot::valueRange_stretch(){
-    //visible range of x axis
-    double valueRangeX = abs(max_x - min_x);
-    //visible range of y axis
-    double valueRangeY = abs(max_y - min_y);
     //set limits
     visible_min_y = min_y;
     visible_min_x = min_x;
@@ -98,28 +120,28 @@ void Plot::valueRange_stretch(){
     visible_max_x = max_x;
 }
 
-void Plot::valueRange_scaley(){
+void Plot::valueRange_scaley(double center){
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
     //y range per cell (with cell aspect ratio included) * X cells
     double valueRangeX = valueRangeY/(windowSize.second)*windowSize.first*cellAspectRatio;
     //set limits
     visible_min_y = min_y;
-    visible_min_x = (min_x+max_x)/2 - valueRangeX/2;
+    visible_min_x = center - valueRangeX/2;
     visible_max_y = max_y;
-    visible_max_x = visible_min_x + valueRangeX;
+    visible_max_x = center + valueRangeX/2;
 }
 
 
-void Plot::valueRange_scalex(){
+void Plot::valueRange_scalex(double center){
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
     //x range per cell  * y cells (with cell aspect ratio included)
     double valueRangeY = valueRangeX/(windowSize.first*cellAspectRatio)*windowSize.second;
     //set limits
-    visible_min_y = (min_y+max_y)/2 - valueRangeY/2;;
+    visible_min_y = center - valueRangeY/2;
     visible_min_x = min_x;
-    visible_max_y = visible_min_y + valueRangeY;
+    visible_max_y = center + valueRangeY/2;
     visible_max_x = max_x;
 }
 
@@ -222,8 +244,8 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
                 YlowerLimit = (windowSize.first -1 - b)/a;
                 YupperLimit = -b/a;
             }
-            int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.first, p2.first));
-            int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.first, p2.first));
+            int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.second, p2.second));
+            int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
                     printableData[YlowerCoord++][static_cast<int>(round(x))] = symbol;
@@ -232,6 +254,39 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2, char symbol){
         }
     }
 }
+
+//DATA ACCESS AND MODIFICATION
+std::pair<unsigned, unsigned> Plot::getWindowSize(){
+    return windowSize;
+}
+double Plot::getCellAspectRation(){
+    return cellAspectRatio;
+}
+Scale Plot::getScaling(){
+    return scale;
+}
+
+void Plot::setWindowSize(std::pair<unsigned, unsigned> WindowSize){
+    for(int i = 0; i < windowSize.second; i++){
+        printableData[i] = nullptr;
+    }
+    delete printableData;
+    windowSize = WindowSize;
+    printableData = new char*[windowSize.second];
+    for(int i = 0; i < windowSize.second; i++){
+        printableData[i] = new char[windowSize.first];   
+    }
+
+}
+void Plot::setCellAspectratio(double CellAspectRatio){
+    cellAspectRatio = CellAspectRatio;
+
+}
+void Plot::setScaling(Scale Scale){
+    scale = Scale;
+
+}
+
 
 
 //operators
