@@ -28,10 +28,6 @@ private:
     //char symbol;
     std::list<std::reference_wrapper<PlotData>> dataSets;
     //range of chart
-    double min_y;
-    double min_x;
-    double max_y;
-    double max_x;
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
@@ -48,9 +44,8 @@ private:
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& DataSet);
 
-    void setRange();
+    std::tuple<double,double,double,double> getRange();
     //DataModification
-    void DataModified(std::tuple<double,double,double,double> rangeBefore, std::tuple<double,double,double,double> rangeAfter);
 public:
 
     //OPTIONS MODIFICATION

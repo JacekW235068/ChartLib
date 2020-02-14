@@ -9,12 +9,7 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     ) :
     windowSize(WindowSize),
     scale(Scale),
-    cellAspectRatio(CellAspectRatio),
-    min_x(__DBL_MAX__),
-    max_x(__DBL_MIN__),
-    min_y(__DBL_MAX__),
-    max_y(__DBL_MIN__)
-
+    cellAspectRatio(CellAspectRatio)
 {
     dataSets = std::list<std::reference_wrapper<PlotData>>();
     //create array of chars for chart  
@@ -34,35 +29,18 @@ Plot::~Plot()
 }
 void Plot::addDataSet(PlotData& plot){
     dataSets.push_back(plot);
-    auto range = plot.getRange();
-    if (std::isnan(std::get<0>(range)))
-    return;
-    if(std::get<0>(range) < min_x)
-        min_x = std::get<0>(range);
-    if(std::get<1>(range) > max_x)
-        max_x = std::get<1>(range);
-    if(std::get<2>(range) < min_y)
-        min_y = std::get<2>(range);
-    if(std::get<3>(range) > max_y)
-        max_y = std::get<3>(range);
-    
 }
 
 
 void Plot::createChart(double center){
     //calculate visible value range, set limits
-    
-
+    getRange();
     switch (scale)
     {
     case Scale::AlignToX:
-        if (std::isnan(center))
-            center = (max_y+min_y)/2;
         valueRange_scalex(center);
         break;
     case Scale::AlignToY:
-        if (std::isnan(center))
-            center = (max_x+min_x)/2;
         valueRange_scaley(center);
         break;    
     default:
@@ -90,7 +68,7 @@ void Plot::createChart(double center){
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
     //calculate visible value range, set limits
     if (Xrange.first >= Xrange.second || Yrange.first >= Yrange.second)
-        return; //should propably throw here
+        return; //should probably throw here
     visible_min_x = Xrange.first;
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
@@ -113,6 +91,7 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
     }
 }
 void Plot::valueRange_stretch(){
+    auto [min_x,max_x,min_y,max_y] = getRange();
     //set limits
     visible_min_y = min_y;
     visible_min_x = min_x;
@@ -130,6 +109,9 @@ void Plot::valueRange_stretch(){
 }
 
 void Plot::valueRange_scaley(double center){
+    auto [min_x,max_x,min_y,max_y] = getRange();
+    if (std::isnan(center))
+        center = (max_x+min_x)/2;
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
     visible_min_y = min_y;
@@ -148,6 +130,9 @@ void Plot::valueRange_scaley(double center){
 
 
 void Plot::valueRange_scalex(double center){
+    auto [min_x,max_x,min_y,max_y] = getRange();
+    if (std::isnan(center))
+        center = (max_y+min_y)/2;
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
     visible_min_x = min_x;
@@ -312,58 +297,13 @@ void Plot::RemoveData(PlotData& removed){
     dataSets.remove_if([&removed](PlotData& data){
         return (&data == &removed);
     });
-    auto removedRange = removed.getRange();
-    //If its possible that chart range was defined by remved dataset range, find new chart range
-    if(std::get<0>(removedRange) == min_x){
-        setRange();
-        return;
-    }
-    if(std::get<1>(removedRange) == max_x){
-        setRange();
-        return;
-    }
-    if(std::get<2>(removedRange) == min_y){
-        setRange();
-        return;
-    }
-    if(std::get<3>(removedRange) == min_y){
-        setRange();
-        return;
-    }
 }
-void Plot::DataModified(std::tuple<double,double,double,double> rangeBefore, std::tuple<double,double,double,double> rangeAfter){
-    if(std::isnan(std::get<0>(rangeAfter))){
-        setRange();
-        return;
-    }
-    //if dataset defined chart range in past new range should be calculated
-    if(std::get<0>(rangeBefore) == min_x && std::get<0>(rangeAfter) < min_x){
-        setRange();
-        return;}
-    if(std::get<1>(rangeBefore) == max_x && std::get<1>(rangeAfter) > max_x){
-        setRange();
-        return;}
-    if(std::get<2>(rangeBefore) == min_y && std::get<2>(rangeAfter) < min_y){
-        setRange();
-        return;}
-    if(std::get<3>(rangeBefore) == max_y && std::get<3>(rangeAfter)>max_y){
-        setRange();
-        return;}
-    //if new dataset range exceeds old char range, it should be updated
-    if(std::get<0>(rangeAfter) < min_x)
-        min_x = std::get<0>(rangeAfter);
-    if(std::get<1>(rangeAfter) > max_x)
-        max_x = std::get<1>(rangeAfter);
-    if(std::get<2>(rangeAfter) < min_y)
-        min_y = std::get<2>(rangeAfter);
-    if(std::get<3>(rangeAfter) > max_y)
-        max_y = std::get<3>(rangeAfter);
-}
-void Plot::setRange(){
-    min_x = __DBL_MAX__;
-    min_y = __DBL_MAX__;
-    max_x = __DBL_MIN__;
-    max_y = __DBL_MIN__;
+
+std::tuple<double,double,double,double> Plot::getRange(){
+    double min_x = __DBL_MAX__;
+    double min_y = __DBL_MAX__;
+    double max_x = __DBL_MIN__;
+    double max_y = __DBL_MIN__;
     for(PlotData& data : dataSets){
         auto range = data.getRange();
         if (std::isnan(std::get<0>(range)))
@@ -377,6 +317,7 @@ void Plot::setRange(){
         if(std::get<3>(range) > max_y)
             max_y = std::get<3>(range);
     }
+    return std::make_tuple(min_x,max_x,min_y,max_y);
 }
 
 //operators

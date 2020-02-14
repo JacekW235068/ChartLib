@@ -6,7 +6,7 @@
 PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol, Style Style) 
 : PlotData(Symbol, Style), 
 dataSet(DataSet){
-
+    getRange();
 }
 
 std::tuple<double,double,double,double> PlotDataSet::getRange() const{
@@ -48,4 +48,17 @@ std::list<std::pair<double,double>> PlotDataSet::getData(std::pair<double,double
             visibleData.push_back(data);
     }
     return visibleData;
+}
+void PlotDataSet::dataSetChanged(){
+    min_y = nan("");
+    min_x = nan("");
+    max_y = nan("");
+    max_x = nan("");
+}
+void PlotDataSet::modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda){
+    lambda(dataSet);
+    min_y = nan("");
+    min_x = nan("");
+    max_y = nan("");
+    max_x = nan("");
 }
