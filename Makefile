@@ -1,8 +1,10 @@
-CXXFLAGS=
+CXXFLAGS=-std=c++1z
 OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
 all:	static
  
+.PHONY: clean-main clean-obj create_dir clean_all
+.IGNORE: create_dir 
 debug: CXXFLAGS+= -DDEBUG -g
 debug: exec
 
@@ -15,11 +17,13 @@ exec: 	main.cpp chartLib.a
 static: chartLib.a
 	@echo "Done."
 
-chartLib.a: $(OBJFILES)
+chartLib.a: create_dir $(OBJFILES)
 	@echo "Archiving files: $(OBJFILES)"
 	@ar vrs chartLib.a obj/*.o
 
 
+create_dir: 
+	@mkdir -vp obj
 %.o: ./Source/%.cpp ./Header/%.hpp
 	@echo "Compiling file $< to obj/$@... ( $(CXX) $(CXXFLAGS) )" 
 	@$(CXX) -c -o obj/$@ $<
