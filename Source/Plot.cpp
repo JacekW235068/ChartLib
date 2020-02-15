@@ -9,12 +9,7 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     ) :
     windowSize(WindowSize),
     scale(Scale),
-    cellAspectRatio(CellAspectRatio),
-    min_x(__DBL_MAX__),
-    max_x(__DBL_MIN__),
-    min_y(__DBL_MAX__),
-    max_y(__DBL_MIN__)
-
+    cellAspectRatio(CellAspectRatio)
 {
     dataSets = std::list<std::reference_wrapper<PlotData>>();
     //create array of chars for chart  
@@ -34,35 +29,18 @@ Plot::~Plot()
 }
 void Plot::addDataSet(PlotData& plot){
     dataSets.push_back(plot);
-    auto range = plot.getRange();
-    if (std::isnan(std::get<0>(range)))
-    return;
-    if(std::get<0>(range) < min_x)
-        min_x = std::get<0>(range);
-    if(std::get<1>(range) > max_x)
-        max_x = std::get<1>(range);
-    if(std::get<2>(range) < min_y)
-        min_y = std::get<2>(range);
-    if(std::get<3>(range) > max_y)
-        max_y = std::get<3>(range);
-    
 }
 
 
 void Plot::createChart(double center){
     //calculate visible value range, set limits
-    
-
+    getRange();
     switch (scale)
     {
     case Scale::AlignToX:
-        if (std::isnan(center))
-            center = (max_y+min_y)/2;
         valueRange_scalex(center);
         break;
     case Scale::AlignToY:
-        if (std::isnan(center))
-            center = (max_x+min_x)/2;
         valueRange_scaley(center);
         break;    
     default:
@@ -90,7 +68,7 @@ void Plot::createChart(double center){
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
     //calculate visible value range, set limits
     if (Xrange.first >= Xrange.second || Yrange.first >= Yrange.second)
-        return; //should propably throw here
+        return; //should probably throw here
     visible_min_x = Xrange.first;
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
@@ -113,36 +91,63 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
     }
 }
 void Plot::valueRange_stretch(){
+    auto [min_x,max_x,min_y,max_y] = getRange();
     //set limits
     visible_min_y = min_y;
     visible_min_x = min_x;
     visible_max_y = max_y;
     visible_max_x = max_x;
+    // single point/straight line scenario
+    if(min_y == max_y){
+        visible_max_y += 0.5;
+        visible_min_y -= 0.5;
+    }
+    if(min_x == max_x){
+        visible_max_x += 0.5;
+        visible_min_x -= 0.5;
+    }
 }
 
 void Plot::valueRange_scaley(double center){
+    auto [min_x,max_x,min_y,max_y] = getRange();
+    if (std::isnan(center))
+        center = (max_x+min_x)/2;
     //range of y axis
     double valueRangeY = abs(max_y - min_y);
+    visible_min_y = min_y;
+    visible_max_y = max_y;
+    // single point/straight line scenario
+    if(valueRangeY == 0){
+        visible_min_y -= 0.5;
+        visible_max_y += 0.5;
+        valueRangeY = 1.0;
+    }
     //y range per cell (with cell aspect ratio included) * X cells
     double valueRangeX = valueRangeY/(windowSize.second)*windowSize.first*cellAspectRatio;
-    //set limits
-    visible_min_y = min_y;
     visible_min_x = center - valueRangeX/2;
-    visible_max_y = max_y;
     visible_max_x = center + valueRangeX/2;
 }
 
 
 void Plot::valueRange_scalex(double center){
+    auto [min_x,max_x,min_y,max_y] = getRange();
+    if (std::isnan(center))
+        center = (max_y+min_y)/2;
     //range of x axis
     double valueRangeX = abs(max_x - min_x);
+    visible_min_x = min_x;
+    visible_max_x = max_x;
+    // single point/straight line scenario
+    if(valueRangeX == 0){
+        visible_min_x -= 0.5;
+        visible_max_x += 0.5;
+        valueRangeX = 1.0;
+    }
     //x range per cell  * y cells (with cell aspect ratio included)
     double valueRangeY = valueRangeX/(windowSize.first*cellAspectRatio)*windowSize.second;
     //set limits
     visible_min_y = center - valueRangeY/2;
-    visible_min_x = min_x;
     visible_max_y = center + valueRangeY/2;
-    visible_max_x = max_x;
 }
 
 void Plot::drawDots(PlotData& DataSet){
@@ -173,7 +178,7 @@ void Plot::drawLines(PlotData& plotData){
         static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
         static_cast<int>(round((dataSet.begin()->second-visible_min_y)/visibleRangeY*(windowSize.second-1)))
     );  
-    for(std::pair<double,double>& data : dataSet){
+    for(const std::pair<double,double>& data : dataSet){
         int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         drawLine(previousCoords, {x,y}, plotData.symbol);
@@ -292,7 +297,33 @@ void Plot::setScaling(Scale Scale){
 
 }
 
+void Plot::RemoveData(PlotData& removed){
+    //remove from reference list
+    dataSets.remove_if([&removed](PlotData& data){
+        return (&data == &removed);
+    });
+}
 
+std::tuple<double,double,double,double> Plot::getRange(){
+    double min_x = __DBL_MAX__;
+    double min_y = __DBL_MAX__;
+    double max_x = __DBL_MIN__;
+    double max_y = __DBL_MIN__;
+    for(PlotData& data : dataSets){
+        auto range = data.getRange();
+        if (std::isnan(std::get<0>(range)))
+            break;
+        if(std::get<0>(range) < min_x)
+            min_x = std::get<0>(range);
+        if(std::get<1>(range) > max_x)
+            max_x = std::get<1>(range);
+        if(std::get<2>(range) < min_y)
+            min_y = std::get<2>(range);
+        if(std::get<3>(range) > max_y)
+            max_y = std::get<3>(range);
+    }
+    return std::make_tuple(min_x,max_x,min_y,max_y);
+}
 
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 

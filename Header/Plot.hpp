@@ -28,10 +28,6 @@ private:
     //char symbol;
     std::list<std::reference_wrapper<PlotData>> dataSets;
     //range of chart
-    double min_y;
-    double min_x;
-    double max_y;
-    double max_x;
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
@@ -48,8 +44,8 @@ private:
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& DataSet);
 
-
-    
+    std::tuple<double,double,double,double> getRange();
+    //DataModification
 public:
 
     //OPTIONS MODIFICATION
@@ -59,7 +55,8 @@ public:
     void setCellAspectratio(double CellAspectRatio);
     //Requires Recreating chart!!!
     void setScaling(Scale Scale);
-
+    //ATTENCTION: SKETCHY AS FUCK
+    void RemoveData(PlotData& removed);
     //OPTIONS ACCESS
     std::pair<unsigned, unsigned> getWindowSize();
     double getCellAspectRation();

@@ -1,7 +1,9 @@
 
 CXXFLAGS=-std=c++1z -Wall -Wpedantic -Wextra
 
+
 OBJFILES= PlotData.o Plot.o PlotDataSet.o 
+
 
 all:	static
  
@@ -36,6 +38,7 @@ create_dir:
 clean-main:	
 	@echo "Removing exec Main..."
 	@rm -rf Main
+
 
 clean-obj:  
 	@echo "Removing all objective files..."
