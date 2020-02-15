@@ -1,19 +1,49 @@
-CC=g++
+
+CXXFLAGS=-std=c++1z
 
 
-Debug: main.cpp chartLib.a
-	$(CC) -g main.cpp chartLib.a -o Main -std=c++1z
+OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
-static: chartLib.a clean
 
-chartLib.a:  Plot.o PlotData.o PlotDataSet.o
-	ar rs chartLib.a Plot.o PlotData.o PlotDataSet.o
+all:	static
+ 
 
+.PHONY: clean-main clean-obj create_dir clean_all
+.IGNORE: create_dir 
+
+debug: CXXFLAGS+= -DDEBUG -g
+debug: exec
+
+exec: 	main.cpp chartLib.a
+	@echo "Compiling using $(CXX)..."
+	@$(CXX) $(CXXFLAGS) main.cpp chartLib.a -o Main
+	@echo "Done."
+
+
+static: chartLib.a
+	@echo "Done."
+
+chartLib.a: create_dir $(OBJFILES)
+	@echo "Archiving files: $(OBJFILES)"
+	@ar vrs chartLib.a obj/*.o
+
+
+create_dir: 
+	@mkdir -vp obj
+  
 %.o: ./Source/%.cpp ./Header/%.hpp
-	$(CC) -g -c -o $@ $< -std=c++1z
+	@echo "Compiling file $< to obj/$@... ( $(CXX) $(CXXFLAGS) )" 
+	@$(CXX) -c -o obj/$@ $<
 
-clean:
-	rm -rf *.o  main Main
+clean-main:	
+	@echo "Removing exec Main..."
+	@rm -rf Main
 
-clean-all:
-	rm -rf *.o *.a main Main
+
+clean-obj:  
+	@echo "Removing all objective files..."
+	@rm -rf obj/*.o
+
+clean-all: clean-main clean-obj
+	@echo "Removing dynamic library..."
+	@rm -rf chartLib.a
