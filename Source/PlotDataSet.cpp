@@ -40,15 +40,14 @@ std::tuple<double,double,double,double> PlotDataSet::getRange() const{
 const std::list<std::pair<double,double>>& PlotDataSet::getData() const{
     return dataSet;
 }
-std::list<std::pair<double,double>> PlotDataSet::getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const{
+/* std::list<std::pair<double,double>> PlotDataSet::getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const{
     std::list<std::pair<double,double>> visibleData;
     for(const auto& data : dataSet){
         if(data.first >= Xrange.first && data.first <= Xrange.second
         && data.second >= Yrange.first && data.second <= Yrange.second)
             visibleData.push_back(data);
     }
-    return visibleData;
-}
+    return visibleData;}*/
 
 void PlotDataSet::setData(std::list<std::pair<double, double>> DataSet){
     dataSet = DataSet;
@@ -65,3 +64,4 @@ void PlotDataSet::modifyDataSet(std::function<void(std::list<std::pair<double, d
     max_y = nan("");
     max_x = nan("");
 }
+

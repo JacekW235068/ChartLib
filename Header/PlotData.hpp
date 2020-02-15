@@ -20,7 +20,6 @@ public:
     char symbol;
     virtual std::tuple<double,double,double,double> getRange() const = 0;
     virtual const std::list<std::pair<double,double>>& getData() const = 0;
-    virtual std::list<std::pair<double,double>> getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const = 0;
     PlotData(char Symbol = 'o', Style Style = Style::dots);
     PlotData(const PlotData& plot) = delete; //not sure if it does anything but just keeping it as temporary check for copying
     virtual ~PlotData();
