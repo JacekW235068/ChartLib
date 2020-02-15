@@ -12,10 +12,10 @@ class PlotDataSet : public PlotData
 private:
     std::list<std::pair<double, double>> dataSet;
 public:
-    void dataSetChanged();
+    void setData(std::list<std::pair<double, double>> DataSet);
     void modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda);
     PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol = 'o', Style Style = Style::dots);
     std::tuple<double,double,double,double> getRange() const;
-    std::list<std::pair<double,double>>& getData();
+    const std::list<std::pair<double,double>>& getData() const;
     std::list<std::pair<double,double>> getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const;
 };  

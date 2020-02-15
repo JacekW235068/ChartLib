@@ -173,7 +173,7 @@ void Plot::drawLines(PlotData& plotData){
         static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
         static_cast<int>(round((dataSet.begin()->second-visible_min_y)/visibleRangeY*(windowSize.second-1)))
     );  
-    for(std::pair<double,double>& data : dataSet){
+    for(const std::pair<double,double>& data : dataSet){
         int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         drawLine(previousCoords, {x,y}, plotData.symbol);
