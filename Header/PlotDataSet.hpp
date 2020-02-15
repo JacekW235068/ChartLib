@@ -15,5 +15,4 @@ public:
     PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol = 'o', Style Style = Style::dots);
     std::tuple<double,double,double,double> getRange() const;
     std::list<std::pair<double,double>>& getData();
-    std::list<std::pair<double,double>> getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const;
 };  

@@ -150,12 +150,17 @@ void Plot::drawDots(PlotData& DataSet){
     double visibleRangeY = visible_max_y - visible_min_y;
     
     //asign each element to place in chart
-    for(const auto& data : DataSet.getData({visible_min_x, visible_max_x}, {visible_min_x, visible_max_x})){
-        int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
+    std::list< std::pair<double, double> > listElements = DataSet.getData();
+
+    for(const auto& data : DataSet.getData()){
+       if(data.first >= visible_min_x && data.first <= visible_max_x &&
+	  data.second >= visible_min_x && data.second <= visible_max_x ){
+	int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         //check if in visible range
-        if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
-            printableData[y][x] = DataSet.symbol;
+       	if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
+       		   printableData[y][x] = DataSet.symbol;
+  	 }
     }
 }
 

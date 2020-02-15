@@ -34,7 +34,7 @@ std::tuple<double,double,double,double> PlotDataSet::getRange() const{
 std::list<std::pair<double,double>>& PlotDataSet::getData(){
     return dataSet;
 }
-std::list<std::pair<double,double>> PlotDataSet::getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const{
+/* std::list<std::pair<double,double>> PlotDataSet::getData(std::pair<double,double> Xrange, std::pair<double,double> Yrange) const{
     std::list<std::pair<double,double>> visibleData;
     for(const auto& data : dataSet){
         if(data.first >= Xrange.first && data.first <= Xrange.second
@@ -42,4 +42,4 @@ std::list<std::pair<double,double>> PlotDataSet::getData(std::pair<double,double
             visibleData.push_back(data);
     }
     return visibleData;
-}
+} */

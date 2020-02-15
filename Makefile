@@ -1,5 +1,5 @@
 
-CXXFLAGS=-std=c++1z
+CXXFLAGS=-std=c++1z -Wall -Wpedantic -Wextra
 
 OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
@@ -31,7 +31,7 @@ create_dir:
   
 %.o: ./Source/%.cpp ./Header/%.hpp
 	@echo "Compiling file $< to obj/$@... ( $(CXX) $(CXXFLAGS) )" 
-	@$(CXX) -c -o obj/$@ $<
+	@$(CXX) $(CXXFLAGS) -c -o obj/$@ $<
 
 clean-main:	
 	@echo "Removing exec Main..."
