@@ -1,16 +1,19 @@
 
-CXXFLAGS=-std=c++1z -Wall -Wpedantic -Wextra
+CXXFLAGS=-std=c++1z 
 
 
 OBJFILES= PlotData.o Plot.o PlotDataSet.o 
 
 
 all:	static
- 
+allWall: CXXFLAGS+= -Wall -Wpedantic -Wextra
+allWall: static
 
 .PHONY: clean-main clean-obj create_dir clean_all
 .IGNORE: create_dir 
 
+debugWall: CXXFLAGS+= -DDEBUG -g -Wall -Wpedantic -Wextra
+debugWall: exec
 debug: CXXFLAGS+= -DDEBUG -g
 debug: exec
 

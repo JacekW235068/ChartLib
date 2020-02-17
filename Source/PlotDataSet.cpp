@@ -3,8 +3,8 @@
 
 
 
-PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol, Style Style) 
-: PlotData(Symbol, Style), 
+PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol, Color color, Style Style) 
+: PlotData(Symbol, Style, color), 
 dataSet(DataSet){
     getRange();
 }
