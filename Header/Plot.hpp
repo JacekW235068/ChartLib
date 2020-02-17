@@ -8,6 +8,7 @@
 #include <cmath>
 #include <tuple>
 #include <memory>
+#include <map>
 
 #include "./PlotData.hpp"
 #include "../Enum/Scale.cpp"
@@ -22,7 +23,7 @@ private:
     Scale scale;
     double cellAspectRatio;
     //Array of printable data
-    char** printableData;
+    std::string printableChart;
     std::pair<unsigned, unsigned> windowSize;
     //symbol used for drawing chart
     //char symbol;
@@ -41,8 +42,8 @@ private:
     void valueRange_scaley(double center);
     void valueRange_stretch();
     //Style methods, "draws" symbol onto printable data
-    void drawDots(PlotData& DataSet);
-    void drawLines(PlotData& DataSet);
+    void drawDots(PlotData& DataSet, std::map<std::pair<double,double>,  const std::string*>& chartMap);
+    void drawLines(PlotData& plotData, std::map<std::pair<double,double>,  const std::string*>& chartMap);
 
     std::tuple<double,double,double,double> getRange();
     //DataModification
@@ -74,7 +75,7 @@ public:
     void createChart(double center = nan(""));
     void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
     //Draw line between p1 and p2
-    void drawLine(std::pair<int,int> p1, std::pair<int,int> p2, char symbol);
+    void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol, std::map<std::pair<double,double>,  const std::string*>& chartMap);
     void addDataSet(PlotData& plot);
 
     //FRIENDS AND STUFF
