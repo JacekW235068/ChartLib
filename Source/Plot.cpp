@@ -108,6 +108,12 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
             x = coords.second;
     }
 }
+
+void Plot::clearChart(){
+    printableChart.clear();
+}
+
+
 void Plot::valueRange_stretch(){
     auto [min_x,max_x,min_y,max_y] = getRange();
     //set limits
