@@ -9,6 +9,7 @@
 #include <tuple>
 #include <memory>
 #include <map>
+#include <sstream>
 
 #include "./PlotData.hpp"
 #include "../Enum/Scale.cpp"
@@ -74,6 +75,7 @@ public:
     ~Plot();
 
     //METHODS
+    void addSimpleFrame();
     void clearChart();
     void createChart(double center = nan(""));
     void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);

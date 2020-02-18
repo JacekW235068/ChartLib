@@ -66,7 +66,6 @@ void Plot::createChart(double center){
         else
             x = coords.second;
     }
-
 }
 
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
@@ -319,6 +318,8 @@ void Plot::RemoveData(PlotData& removed){
     });
 }
 
+
+
 std::tuple<double,double,double,double> Plot::getRange(){
     double min_x = __DBL_MAX__;
     double min_y = __DBL_MAX__;
@@ -339,6 +340,28 @@ std::tuple<double,double,double,double> Plot::getRange(){
     }
     return std::make_tuple(min_x,max_x,min_y,max_y);
 }
+
+void Plot::addSimpleFrame(){
+    std::string top= u8"╔";
+    std::string bottom = u8"╚";
+    for (int i=0; i < windowSize.first; i++){
+        bottom += u8"═";
+        top += u8"═";
+    }
+    top+= u8"╗\n";
+    bottom += u8"╝\n";
+    std::stringstream stream(printableChart);
+    std::string line;
+    while (getline(stream,line,'\n')){
+        top += u8"║";
+        top += line;
+        top += "\033[39m";
+        top += u8"║\n";
+    }
+    top += bottom;
+    printableChart = top;
+}
+
 
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
