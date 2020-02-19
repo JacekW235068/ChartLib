@@ -361,7 +361,29 @@ void Plot::addSimpleFrame(){
     top += bottom;
     printableChart = top;
 }
-
+void Plot::addAxisFrame(int Xprecission, int Yprecission){
+    double visibleRangeX = visible_max_x - visible_min_x;
+    double xUnit = pow(10.0,Xprecission);
+    double x = ceil(visible_min_x/xUnit)*xUnit;
+    std::string xAxis = "";
+    int preAxisCoord = -1;
+    std::string number;
+    while (x <= visible_max_x){
+        x = round(x*pow(10.0,-Xprecission))/pow(10.0,-Xprecission);
+        int axisCoord = static_cast<int>(round((x-visible_min_x)/visibleRangeX*(windowSize.first-1)));
+        //fill spaces
+        xAxis += std::string(axisCoord -preAxisCoord -1, ' ');  
+        number = std::to_string(x);  
+        if(Xprecission >=0){   
+            number = number.substr(0,number.find('.'));
+        }else
+            number = number.substr(0,number.find('.')-Xprecission+1);
+        xAxis += number;
+        preAxisCoord = xAxis.length()-1;
+        x+= pow(10.0,Xprecission);
+    }
+    printableChart += "\033[39m"+xAxis + "\n";
+}
 
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 

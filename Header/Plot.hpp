@@ -76,6 +76,7 @@ public:
 
     //METHODS
     void addSimpleFrame();
+    void addAxisFrame(int Xprecission = 0, int Yprecission = 0);
     void clearChart();
     void createChart(double center = nan(""));
     void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
