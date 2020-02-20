@@ -362,9 +362,11 @@ void Plot::addSimpleFrame(){
     printableChart = top;
 }
 void Plot::addAxisFrame(int Xprecission, int Yprecission){
+    //XAXIS
     double visibleRangeX = visible_max_x - visible_min_x;
     double xUnit = pow(10.0,Xprecission);
     double x = ceil(visible_min_x/xUnit)*xUnit;
+    std::string xAxisMarks = std::string(windowSize.first+1,' ');
     std::string xAxis = "";
     int preAxisCoord = -1;
     std::string number;
@@ -372,6 +374,11 @@ void Plot::addAxisFrame(int Xprecission, int Yprecission){
         x = round(x*pow(10.0,-Xprecission))/pow(10.0,-Xprecission);
         int axisCoord = static_cast<int>(round((x-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         //fill spaces
+        xAxisMarks[axisCoord+1] = '.';
+        if(axisCoord -preAxisCoord -1<0){
+            x+= pow(10.0,Xprecission);
+            break;
+        }
         xAxis += std::string(axisCoord -preAxisCoord -1, ' ');  
         number = std::to_string(x);  
         if(Xprecission >=0){   
@@ -382,7 +389,38 @@ void Plot::addAxisFrame(int Xprecission, int Yprecission){
         preAxisCoord = xAxis.length()-1;
         x+= pow(10.0,Xprecission);
     }
-    printableChart += "\033[39m"+xAxis + "\n";
+    //YAXIS
+    std::stringstream stream(printableChart);
+    std::string line;
+    std::string newPrintableChart;
+    double visibleRangeY = visible_max_y - visible_min_y;
+    double yUnit = pow(10.0,Yprecission);
+    double y = floor(visible_max_y/yUnit)*yUnit;
+    y = round(y*pow(10.0,-Yprecission))/pow(10.0,-Yprecission);
+    int axisCoord = static_cast<int>(round((visible_max_y - y)/visibleRangeY*(windowSize.second-1)));
+    int lineCounter = 0;
+    while(getline(stream,line,'\n')){
+        if(axisCoord == lineCounter){
+            number = std::to_string(y);  
+            if(Yprecission >=0){   
+                number = number.substr(0,number.find('.'));
+            }else
+                number = number.substr(0,number.find('.')-Yprecission+1);
+            newPrintableChart +=  "\033[39m-" + line + "\033[39m-"+number+"\n";
+            while (axisCoord==lineCounter){
+                y-= pow(10.0,Yprecission);
+                y = round(y*pow(10.0,-Yprecission))/pow(10.0,-Yprecission);
+                axisCoord = static_cast<int>(round((visible_max_y - y)/visibleRangeY*(windowSize.second-1)));
+            }
+        }else{
+            newPrintableChart +=' '+line +'\n';
+        }
+        lineCounter++;
+    }
+
+    printableChart = newPrintableChart;
+    printableChart ="\033[39m" + xAxisMarks +'\n' + printableChart+"\033[39m" + xAxisMarks +'\n'+xAxis + '\n';
+
 }
 
 //operators
