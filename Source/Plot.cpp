@@ -377,7 +377,7 @@ void Plot::addAxisFrame(int Xprecission, int Yprecission){
         xAxisMarks[axisCoord+1] = '.';
         if(axisCoord -preAxisCoord -1<0){
             x+= pow(10.0,Xprecission);
-            break;
+            continue;
         }
         xAxis += std::string(axisCoord -preAxisCoord -1, ' ');  
         number = std::to_string(x);  
@@ -385,7 +385,7 @@ void Plot::addAxisFrame(int Xprecission, int Yprecission){
             number = number.substr(0,number.find('.'));
         }else
             number = number.substr(0,number.find('.')-Xprecission+1);
-        xAxis += number;
+        xAxis += number+' ';
         preAxisCoord = xAxis.length()-1;
         x+= pow(10.0,Xprecission);
     }
