@@ -24,7 +24,7 @@ private:
     Scale scale;
     double cellAspectRatio;
     //Array of printable data
-    std::string printableChart;
+    std::list<std::string> printableChart;
     std::pair<unsigned, unsigned> windowSize;
     //symbol used for drawing chart
     //char symbol;
@@ -34,7 +34,7 @@ private:
     double visible_min_x;
     double visible_max_y;
     double visible_max_x;
-
+    std::list<std::string> frame;
     
 
     //METHODS
@@ -75,8 +75,9 @@ public:
     ~Plot();
 
     //METHODS
-    void addSimpleFrame();
-    void addAxisFrame(int Xprecission = 0, int Yprecission = 0);
+    void noFrame();
+    void simpleFrame();
+    void axisFrame(int Xprecission = 0, int Yprecission = 0);
     void clearChart();
     void createChart(double center = nan(""));
     void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
