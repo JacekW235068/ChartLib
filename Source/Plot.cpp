@@ -401,6 +401,23 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
     frame.push_back(xAxisMarks+xAxis);
 }
 
+void Plot::zeroPointAxis(){
+    const static std::string xSymbol= u8"\033[39m•";
+    const static std::string ySymbol = u8"\033[39m•";
+    int YAxis = static_cast<int>(round((visible_max_y)/(visible_max_y-visible_min_y)*(windowSize.second-1)));
+    int XAxis = static_cast<int>(round((-visible_min_x)/(visible_max_x-visible_min_x)*(windowSize.first-1)));
+        if(XAxis >= 0 && XAxis < windowSize.first){
+            for(int y = 0; y < windowSize.second; y++){
+                ChartMap.insert({std::make_pair(y,XAxis), &xSymbol});
+            }
+        }
+        if(YAxis >= 0 && YAxis < windowSize.second){
+            for(int x = 0; x < windowSize.first; x++){
+                ChartMap.insert({std::make_pair(YAxis,x), &ySymbol});
+            }
+        }
+}
+
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
     auto map_it = t.ChartMap.begin();
@@ -414,7 +431,7 @@ std::ostream& operator<<(std::ostream& s, const Plot& t){
             s << std::string((*map_it).first.second-x-1, ' ');
             //place symbol
             s << *(*map_it).second;
-            x = (*map_it).first.second-x-1;
+            x = (*map_it).first.second;
             map_it++;
         }
         s << "\033[39m";

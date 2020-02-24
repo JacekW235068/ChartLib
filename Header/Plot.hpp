@@ -34,7 +34,7 @@ private:
     double visible_max_x;
     std::list<std::string> frame;
     //map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<double,double>, const std::string*> ChartMap;
+    std::map<std::pair<int,int>, const std::string*> ChartMap;
 
     //METHODS
     //scaling methods, sets visible range
@@ -64,7 +64,6 @@ public:
     std::pair<unsigned, unsigned> getWindowSize();
     double getCellAspectRation();
     Scale getScaling();
-
     //CONSTRUCTORS and stuff
     Plot(
         std::pair<unsigned, unsigned> WindowSize,
