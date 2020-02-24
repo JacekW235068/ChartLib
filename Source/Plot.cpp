@@ -23,7 +23,6 @@ void Plot::addDataSet(PlotData& plot){
 
 void Plot::createChart(double center){
     //calculate visible value range, set limits
-    static const std::string endChart= " ";
     getRange();
     switch (scale)
     {
@@ -38,7 +37,6 @@ void Plot::createChart(double center){
         break;
     }
     ChartMap.clear();
-    ChartMap[{windowSize.second-1, 0}] = &endChart;
     //draw chart
     for (PlotData& dataSet : dataSets)
     switch (dataSet.style)
@@ -56,7 +54,6 @@ void Plot::createChart(double center){
 }
 
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
-    static const std::string endChart= " ";
     //calculate visible value range, set limits
     if (Xrange.first >= Xrange.second || Yrange.first >= Yrange.second)
         return; //should probably throw here
@@ -65,7 +62,6 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
     ChartMap.clear();
-    ChartMap[{windowSize.second-1, 0}] = &endChart;
     //draw chart
     for (PlotData& dataSet : dataSets)
     switch (dataSet.style)
@@ -155,7 +151,7 @@ void Plot::drawDots(PlotData& DataSet){
 
     for(const auto& data : DataSet.getData()){
         if(data.first >= visible_min_x && data.first <= visible_max_x &&
-	    data.second >= visible_min_x && data.second <= visible_max_x ){
+	    data.second >= visible_min_y && data.second <= visible_max_y ){
             int y = static_cast<int>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
             int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
             ChartMap[{y, x}] = &DataSet.getStyledSymbol();
@@ -320,7 +316,7 @@ void Plot::noFrame(){
     frame.push_front("");
     for(int i=0; i < windowSize.second; i++){
         frame.push_back("");//prefix
-        frame.push_back("\n");//suffix
+        frame.push_back("");//suffix
     }
     //bottom
     frame.push_back("");
@@ -340,7 +336,7 @@ void Plot::simpleFrame(){
     frame.push_back(top);
     for(int i=0; i < windowSize.second; i++){
         frame.push_back(u8"║");//prefix
-        frame.push_back(u8"║\n");//suffix
+        frame.push_back(u8"║");//suffix
     }
     //bottom
     frame.push_back(bottom);
@@ -390,7 +386,7 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
             }else
                 number = number.substr(0,number.find('.')-Yprecission+1);
             frame.push_back("-");
-            frame.push_back("-"+number+"\n");
+            frame.push_back("-"+number);
             while (axisCoord==lineCounter){
                 y-= pow(10.0,Yprecission);
                 y = round(y*pow(10.0,-Yprecission))/pow(10.0,-Yprecission);
@@ -398,7 +394,7 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
             }
         }else{
             frame.push_back(" ");
-            frame.push_back("\n");
+            frame.push_back("");
         }
         lineCounter++;
     }
@@ -407,42 +403,26 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
 
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
+    auto map_it = t.ChartMap.begin();
     auto frame_it = t.frame.begin();
-    int x = -1;
-    int y = 0;
-    s << *frame_it++;
-    s << *frame_it++;
-    for(const auto& [coords,symbol] : t.ChartMap){
-        if(y != coords.first){
-            s << std::string(t.windowSize.first -x-1,' ');
-            x=-1;
-            y++;
-            s << "\033[39m";
-            s << *frame_it++;
-            s << *frame_it++;
-            while(y < coords.first){
-                s << std::string(t.windowSize.first,' ');
-                y++;
-                s << *frame_it++;
-                s << *frame_it++;
-            }
-        }
+    s <<*frame_it++;
+    for(int line=0;line < t.windowSize.second;line++){
+        int x = -1;
+        s <<*frame_it++;
+        while( map_it != t.ChartMap.end() && (*map_it).first.first == line){
             //fill spaces
-            s << std::string(coords.second-x-1, ' ');
+            s << std::string((*map_it).first.second-x-1, ' ');
             //place symbol
-            s << *symbol;
-            x = coords.second;
+            s << *(*map_it).second;
+            x = (*map_it).first.second-x-1;
+            map_it++;
+        }
+        s << "\033[39m";
+        s << std::string(t.windowSize.first -x-1,' ');
+        s <<*frame_it++;
+        s<< '\n';
     }
-    s << std::string(t.windowSize.first -x-1,' ');
-    s << "\033[39m";
-    s << *frame_it++;
-    s << *frame_it++;
-    while(y < t.windowSize.second-1){
-    s << std::string(t.windowSize.first,' ');
-    y++;
-    s << *frame_it++;
-    s << *frame_it++;
-    }
+    s <<*frame_it++;
     s << "\033[39m";
     s<<'\n';
     return s;
