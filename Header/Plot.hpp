@@ -74,6 +74,10 @@ public:
 
     //METHODS
     void zeroPointAxis();
+    //Draws straight line parallel to x axis
+    void xLine(double y);
+    //Draws straight line parallel to y axis
+    void yLine(double x);
     void noFrame();
     void simpleFrame();
     void axisFrame(int Xprecission = 0, int Yprecission = 0);

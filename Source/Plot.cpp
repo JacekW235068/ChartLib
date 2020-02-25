@@ -418,6 +418,24 @@ void Plot::zeroPointAxis(){
         }
 }
 
+void Plot::yLine(double x){
+    const static std::string symbol= u8"\033[39m•";
+    int XAxis = static_cast<int>(round((x-visible_min_x)/(visible_max_x-visible_min_x)*(windowSize.first-1)));
+        if(XAxis >= 0 && XAxis < windowSize.first){
+            for(int y = 0; y < windowSize.second; y++){
+                ChartMap.insert({std::make_pair(y,XAxis), &symbol});
+            }
+        }
+}
+void Plot::xLine(double y){
+    const static std::string symbol= u8"\033[39m•";
+    int YAxis = static_cast<int>(round((visible_max_y-y)/(visible_max_y-visible_min_y)*(windowSize.second-1)));
+    if(YAxis >= 0 && YAxis < windowSize.second){
+            for(int x = 0; x < windowSize.first; x++){
+                ChartMap.insert({std::make_pair(YAxis,x), &symbol});
+            }
+        }
+}
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
     auto map_it = t.ChartMap.begin();
