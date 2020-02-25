@@ -23,7 +23,6 @@ void Plot::addDataSet(PlotData& plot){
 
 void Plot::createChart(double center){
     //calculate visible value range, set limits
-    static const std::string endLine= "\n";
     getRange();
     switch (scale)
     {
@@ -37,46 +36,24 @@ void Plot::createChart(double center){
         valueRange_stretch();
         break;
     }
-    //map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<double,double>, const std::string*> ChartMap;
+    ChartMap.clear();
     //draw chart
     for (PlotData& dataSet : dataSets)
     switch (dataSet.style)
     {
     case Style::Linear:
-        drawLines(dataSet, ChartMap);
+        drawLines(dataSet);
         break;
     default:
-        drawDots(dataSet, ChartMap);
+        drawDots(dataSet);
         break;
     }
-    printableChart.clear();
-    std::string chartLine = "";
-    int x = -1;
-    int y = 0;
-    for(const auto& [coords,symbol] : ChartMap){
-        if(y != coords.first){
-            
-            printableChart.push_back(chartLine + std::string(windowSize.first -x-1,' '));
-            chartLine.clear();
-            x=-1;
-            y++;
-            while(y < coords.first){
-                printableChart.push_back(std::string(windowSize.first,' '));
-            }
-        }
-            //fill spaces
-            chartLine += std::string(coords.second-x-1, ' ');
-            //place symbol
-            chartLine += *symbol;
-            x = coords.second;
-    }
-    printableChart.push_back(chartLine + std::string(windowSize.first -x-1,' '));
     noFrame();
+
+
 }
 
 void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
-    static const std::string endLine= "\n";
     //calculate visible value range, set limits
     if (Xrange.first >= Xrange.second || Yrange.first >= Yrange.second)
         return; //should probably throw here
@@ -84,46 +61,24 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
-    //map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<double,double>, const std::string*> ChartMap;
+    ChartMap.clear();
     //draw chart
     for (PlotData& dataSet : dataSets)
     switch (dataSet.style)
     {
     case Style::Linear:
-        drawLines(dataSet, ChartMap);
+        drawLines(dataSet);
         break;
     default:
-        drawDots(dataSet, ChartMap);
+        drawDots(dataSet);
         break;
     }
-    printableChart.clear();
-    std::string chartLine = "";
-    int x = -1;
-    int y = 0;
-    for(const auto& [coords,symbol] : ChartMap){
-        if(y != coords.first){
-            
-            printableChart.push_back(chartLine + std::string(windowSize.first -x-1,' '));
-            chartLine.clear();
-            x=-1;
-            y++;
-            while(y < coords.first){
-                printableChart.push_back(std::string(windowSize.first,' '));
-            }
-        }
-            //fill spaces
-            chartLine += std::string(coords.second-x-1, ' ');
-            //place symbol
-            chartLine += *symbol;
-            x = coords.second;
-    }
-    printableChart.push_back(chartLine + std::string(windowSize.first -x-1,' '));
     noFrame();
 }
 
 void Plot::clearChart(){
-    printableChart.clear();
+    ChartMap.clear();
+    frame.clear();
 }
 
 
@@ -187,7 +142,7 @@ void Plot::valueRange_scalex(double center){
     visible_max_y = center + valueRangeY/2;
 }
 
-void Plot::drawDots(PlotData& DataSet, std::map<std::pair<double,double>,  const std::string*>& chartMap){
+void Plot::drawDots(PlotData& DataSet){
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
     
@@ -195,37 +150,35 @@ void Plot::drawDots(PlotData& DataSet, std::map<std::pair<double,double>,  const
     std::list< std::pair<double, double> > listElements = DataSet.getData();
 
     for(const auto& data : DataSet.getData()){
-       if(data.first >= visible_min_x && data.first <= visible_max_x &&
-	  data.second >= visible_min_x && data.second <= visible_max_x ){
-	int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
-        int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-        //check if in visible range
-       	if(x >= 0 && y >= 0 && x < windowSize.first && y < windowSize.second)
-       		   chartMap[{windowSize.second-y-1, x}] = &DataSet.getStyledSymbol();
-  	 }
+        if(data.first >= visible_min_x && data.first <= visible_max_x &&
+	    data.second >= visible_min_y && data.second <= visible_max_y ){
+            int y = static_cast<int>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
+            int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
+            ChartMap[{y, x}] = &DataSet.getStyledSymbol();
+  	    }
     }
 }
 
-void Plot::drawLines(PlotData& plotData, std::map<std::pair<double,double>,  const std::string*>& chartMap){
+void Plot::drawLines(PlotData& plotData){
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
     auto& dataSet = plotData.getData();
     //coords for first point
     std::pair<int,int> previousCoords(
         static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
-        static_cast<int>(round((dataSet.begin()->second-visible_min_y)/visibleRangeY*(windowSize.second-1)))
+        static_cast<int>(round((visible_max_y - dataSet.begin()->second)/visibleRangeY*(windowSize.second-1)))
     );  
     for(const std::pair<double,double>& data : dataSet){
-        int y = static_cast<int>(round((data.second-visible_min_y)/visibleRangeY*(windowSize.second-1)));
+        int y = static_cast<int>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
         int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-        drawLine(previousCoords, {x,y}, plotData.getStyledSymbol(),chartMap);
+        drawLine(previousCoords, {x,y}, plotData.getStyledSymbol());
         //new point becomes old
         previousCoords = {x,y};
     }
 }
 
 
-void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol, std::map<std::pair<double,double>,  const std::string*>& chartMap){
+void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol){
     //straight line X
     if (p1.first == p2.first){
         //is line in visible field?
@@ -234,7 +187,7 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
             int YlowerCoords = std::max(0, std::min(p1.second, p2.second));
             int YupperCoords = std::min(static_cast<int>(windowSize.second-1), std::max(p1.second, p2.second));
             while (YlowerCoords <= YupperCoords){
-       		    chartMap[{windowSize.second-YlowerCoords-1, p1.first}] = &symbol;
+       		    ChartMap[{YlowerCoords, p1.first}] = &symbol;
                 YlowerCoords ++;
             } 
         }
@@ -245,7 +198,7 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
             int XlowerCoords = std::max(0, std::min(p1.first, p2.first));
             int XupperCoords = std::min(static_cast<int>(windowSize.first-1), std::max(p1.first, p2.first));
             while (XlowerCoords <= XupperCoords){
-       		    chartMap[{windowSize.second -p1.second -1, XlowerCoords}] = &symbol; 
+       		    ChartMap[{p1.second, XlowerCoords}] = &symbol; 
                 XlowerCoords ++;
             }
         } 
@@ -274,7 +227,7 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
             //y calculated as function of x
             double y = a*XlowerCoord + b;
             while(XlowerCoord <= XupperCoord){
-       		        chartMap[{windowSize.second- static_cast<int>(round(y))-1, XlowerCoord++}] = &symbol; 
+       		        ChartMap[{static_cast<int>(round(y)), XlowerCoord++}] = &symbol; 
                 y+=a;
             }
         }else{
@@ -295,7 +248,7 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
             int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
-       		        chartMap[{windowSize.second- (YlowerCoord++)-1,static_cast<int>(round(x))}] = &symbol; 
+       		        ChartMap[{(YlowerCoord++),static_cast<int>(round(x))}] = &symbol; 
                 x+=a;
             }
         }
@@ -355,13 +308,15 @@ std::tuple<double,double,double,double> Plot::getRange(){
     return std::make_tuple(min_x,max_x,min_y,max_y);
 }
 
+
+
 void Plot::noFrame(){
     frame.clear();
     //top
     frame.push_front("");
     for(int i=0; i < windowSize.second; i++){
         frame.push_back("");//prefix
-        frame.push_back("\n");//suffix
+        frame.push_back("");//suffix
     }
     //bottom
     frame.push_back("");
@@ -381,7 +336,7 @@ void Plot::simpleFrame(){
     frame.push_back(top);
     for(int i=0; i < windowSize.second; i++){
         frame.push_back(u8"║");//prefix
-        frame.push_back(u8"║\n");//suffix
+        frame.push_back(u8"║");//suffix
     }
     //bottom
     frame.push_back(bottom);
@@ -431,7 +386,7 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
             }else
                 number = number.substr(0,number.find('.')-Yprecission+1);
             frame.push_back("-");
-            frame.push_back("-"+number+"\n");
+            frame.push_back("-"+number);
             while (axisCoord==lineCounter){
                 y-= pow(10.0,Yprecission);
                 y = round(y*pow(10.0,-Yprecission))/pow(10.0,-Yprecission);
@@ -439,25 +394,81 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
             }
         }else{
             frame.push_back(" ");
-            frame.push_back("\n");
+            frame.push_back("");
         }
         lineCounter++;
     }
     frame.push_back(xAxisMarks+xAxis);
 }
 
+void Plot::zeroPointAxis(){
+    const static std::string xSymbol= u8"\033[39m•";
+    const static std::string ySymbol = u8"\033[39m•";
+    int YAxis = static_cast<int>(round((visible_max_y)/(visible_max_y-visible_min_y)*(windowSize.second-1)));
+    int XAxis = static_cast<int>(round((-visible_min_x)/(visible_max_x-visible_min_x)*(windowSize.first-1)));
+        if(XAxis >= 0 && XAxis < windowSize.first){
+            for(int y = 0; y < windowSize.second; y++){
+                ChartMap.insert({std::make_pair(y,XAxis), &xSymbol});
+            }
+        }
+        if(YAxis >= 0 && YAxis < windowSize.second){
+            for(int x = 0; x < windowSize.first; x++){
+                ChartMap.insert({std::make_pair(YAxis,x), &ySymbol});
+            }
+        }
+}
+
+void Plot::yLine(double x){
+    const static std::string symbol= u8"\033[39m•";
+    int XAxis = static_cast<int>(round((x-visible_min_x)/(visible_max_x-visible_min_x)*(windowSize.first-1)));
+        if(XAxis >= 0 && XAxis < windowSize.first){
+            for(int y = 0; y < windowSize.second; y++){
+                ChartMap.insert({std::make_pair(y,XAxis), &symbol});
+            }
+        }
+}
+void Plot::xLine(double y){
+    const static std::string symbol= u8"\033[39m•";
+    int YAxis = static_cast<int>(round((visible_max_y-y)/(visible_max_y-visible_min_y)*(windowSize.second-1)));
+    if(YAxis >= 0 && YAxis < windowSize.second){
+            for(int x = 0; x < windowSize.first; x++){
+                ChartMap.insert({std::make_pair(YAxis,x), &symbol});
+            }
+        }
+}
+
+void Plot::minmaxY(PlotData& data){
+    auto [discardd,discard,miny,maxy] = data.getRange(); 
+    xLine(miny);
+    xLine(maxy);
+}
+void Plot::minmaxX(PlotData& data){
+    auto [minx,maxx,discardd,discard] = data.getRange(); 
+    yLine(minx);
+    yLine(maxx);
+}
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
+    auto map_it = t.ChartMap.begin();
     auto frame_it = t.frame.begin();
-    s << *frame_it++;
-    for(const auto& line : t.printableChart){
-        s << *frame_it++;
-        s <<"\033[39m";
-        s << line;
-        s <<"\033[39m";
-        s << *frame_it++;
+    s <<*frame_it++;
+    for(int line=0;line < t.windowSize.second;line++){
+        int x = -1;
+        s <<*frame_it++;
+        while( map_it != t.ChartMap.end() && (*map_it).first.first == line){
+            //fill spaces
+            s << std::string((*map_it).first.second-x-1, ' ');
+            //place symbol
+            s << *(*map_it).second;
+            x = (*map_it).first.second;
+            map_it++;
+        }
+        s << "\033[39m";
+        s << std::string(t.windowSize.first -x-1,' ');
+        s <<*frame_it++;
+        s<< '\n';
     }
-    s << *frame_it++;
+    s <<*frame_it++;
     s << "\033[39m";
     s<<'\n';
     return s;

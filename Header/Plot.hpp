@@ -23,8 +23,6 @@ private:
     //Style style;
     Scale scale;
     double cellAspectRatio;
-    //Array of printable data
-    std::list<std::string> printableChart;
     std::pair<unsigned, unsigned> windowSize;
     //symbol used for drawing chart
     //char symbol;
@@ -35,7 +33,8 @@ private:
     double visible_max_y;
     double visible_max_x;
     std::list<std::string> frame;
-    
+    //map with coords !(Y,X)! and symbols to draw onto chart 
+    std::map<std::pair<int,int>, const std::string*> ChartMap;
 
     //METHODS
     //scaling methods, sets visible range
@@ -43,10 +42,10 @@ private:
     void valueRange_scaley(double center);
     void valueRange_stretch();
     //Style methods, "draws" symbol onto printable data
-    void drawDots(PlotData& DataSet, std::map<std::pair<double,double>,  const std::string*>& chartMap);
-    void drawLines(PlotData& plotData, std::map<std::pair<double,double>,  const std::string*>& chartMap);
+    void drawDots(PlotData& DataSet);
+    void drawLines(PlotData& plotData);
     //Draw line between p1 and p2
-    void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol, std::map<std::pair<double,double>,  const std::string*>& chartMap);
+    void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol);
     
     std::tuple<double,double,double,double> getRange();
     //DataModification
@@ -65,7 +64,6 @@ public:
     std::pair<unsigned, unsigned> getWindowSize();
     double getCellAspectRation();
     Scale getScaling();
-
     //CONSTRUCTORS and stuff
     Plot(
         std::pair<unsigned, unsigned> WindowSize,
@@ -75,6 +73,13 @@ public:
     ~Plot();
 
     //METHODS
+    void zeroPointAxis();
+    //Draws straight line parallel to x axis
+    void xLine(double y);
+    //Draws straight line parallel to y axis
+    void yLine(double x);
+    void minmaxY(PlotData& data);
+    void minmaxX(PlotData& data);
     void noFrame();
     void simpleFrame();
     void axisFrame(int Xprecission = 0, int Yprecission = 0);
