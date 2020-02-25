@@ -436,6 +436,17 @@ void Plot::xLine(double y){
             }
         }
 }
+
+void Plot::minmaxY(PlotData& data){
+    auto [discardd,discard,miny,maxy] = data.getRange(); 
+    xLine(miny);
+    xLine(maxy);
+}
+void Plot::minmaxX(PlotData& data){
+    auto [minx,maxx,discardd,discard] = data.getRange(); 
+    yLine(minx);
+    yLine(maxx);
+}
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
     auto map_it = t.ChartMap.begin();

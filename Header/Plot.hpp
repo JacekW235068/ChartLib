@@ -78,6 +78,8 @@ public:
     void xLine(double y);
     //Draws straight line parallel to y axis
     void yLine(double x);
+    void minmaxY(PlotData& data);
+    void minmaxX(PlotData& data);
     void noFrame();
     void simpleFrame();
     void axisFrame(int Xprecission = 0, int Yprecission = 0);
