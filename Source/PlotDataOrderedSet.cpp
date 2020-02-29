@@ -1,17 +1,16 @@
-#include "../Header/PlotDataSet.hpp"
+#include "../Header/PlotDataOrderedSet.hpp"
 
 
 
 
-PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol, Color color, Style Style) 
+PlotDataOrderedSet::PlotDataOrderedSet(std::list<std::pair<double, double>> DataSet, char Symbol, Color color, Style Style, bool(*Compare)(const std::pair<double,double>&, const std::pair<double,double>&)) 
 : PlotData(Symbol, Style, color), 
-dataSet(DataSet){
+dataSet(DataSet), compare(Compare){
+    dataSet.sort(compare);
     getRange();
 }
 
-std::tuple<double,double,double,double> PlotDataSet::getRange() const{
-    if(!std::isnan(min_x))
-        return std::make_tuple(min_x,max_x,min_y,max_y);
+std::tuple<double,double,double,double> PlotDataOrderedSet::getRange() const{
     if(dataSet.empty()){
         min_y = nan("");
         min_x = nan("");
@@ -23,12 +22,8 @@ std::tuple<double,double,double,double> PlotDataSet::getRange() const{
     min_y = element.second;
     min_x = element.first;
     max_y = element.second;
-    max_x = element.first;
+    max_x = dataSet.back().first;
     for(const auto& data : dataSet){
-        if (data.first < min_x)
-            min_x = data.first;
-        else if(data.first > max_x)
-            max_x = data.first;
         if (data.second < min_y)
             min_y = data.second;
         else if(data.second > max_y)
@@ -37,19 +32,20 @@ std::tuple<double,double,double,double> PlotDataSet::getRange() const{
     return std::make_tuple(min_x,max_x,min_y,max_y);
 }
 
-const std::list<std::pair<double,double>>& PlotDataSet::getData() const{
+const std::list<std::pair<double,double>>& PlotDataOrderedSet::getData() const{
     return dataSet;
 }
 
-void PlotDataSet::setData(std::list<std::pair<double, double>> DataSet){
+void PlotDataOrderedSet::setData(std::list<std::pair<double, double>> DataSet){
     dataSet = DataSet;
+    dataSet.sort(compare);
     min_y = nan("");
     min_x = nan("");
     max_y = nan("");
     max_x = nan("");
 }
 
-void PlotDataSet::modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda){
+void PlotDataOrderedSet::modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda){
     lambda(dataSet);
     min_y = nan("");
     min_x = nan("");
