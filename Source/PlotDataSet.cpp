@@ -8,6 +8,9 @@ PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symb
 dataSet(DataSet){
     getRange();
 }
+PlotDataSet::~PlotDataSet(){
+
+}
 
 std::tuple<double,double,double,double> PlotDataSet::getRange() const{
     if(!std::isnan(min_x))

@@ -4,8 +4,8 @@
 
 
 PlotDataOrderedSet::PlotDataOrderedSet(std::list<std::pair<double, double>> DataSet, char Symbol, Color color, Style Style, bool(*Compare)(const std::pair<double,double>&, const std::pair<double,double>&)) 
-: PlotData(Symbol, Style, color), 
-dataSet(DataSet), compare(Compare){
+: PlotDataSet(DataSet, Symbol, color, Style), 
+compare(Compare){
     dataSet.sort(compare);
     getRange();
 }
