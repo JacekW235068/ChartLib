@@ -1,0 +1,22 @@
+#pragma once
+#include "../Enum/Style.cpp"
+#include <tuple>
+#include <cmath>
+#include <functional>
+#include "./PlotData.hpp"
+
+class PlotDataFunction : public PlotData
+{
+protected:
+    std::list<std::pair<double, double>> dataSet;
+public:
+    PlotDataFunction(double (*Fun)(double),
+     std::pair<double,double> XRange,
+     char Symbol = 'o',
+     Color color = Color::none, 
+     Style Style = Style::dots);
+    void setRange(std::pair<double,double> XRange);
+    void setFunction(double (*Fun)(double));
+    std::tuple<double,double,double,double> getRange() const;
+    const std::list<std::pair<double,double>>& getData() const;
+};  
