@@ -2,7 +2,7 @@
 CXXFLAGS=-std=c++1z 
 
 
-OBJFILES= PlotData.o Plot.o PlotDataSet.o PlotDataOrderedSet.o
+OBJFILES= PlotData.o Plot.o PlotDataSet.o PlotDataOrderedSet.o PlotDataFunction.o
 
 
 all:	static
