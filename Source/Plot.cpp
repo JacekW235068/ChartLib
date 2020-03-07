@@ -279,6 +279,17 @@ void Plot::setScaling(Scale Scale){
 }
 
 void Plot::RemoveData(PlotData& removed){
+    auto it = ChartMap.begin();
+	while (it != ChartMap.end())
+	{
+		if (it->second == &removed.getStyledSymbol())
+		{
+			it = ChartMap.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
     //remove from reference list
     dataSets.remove_if([&removed](PlotData& data){
         return (&data == &removed);
