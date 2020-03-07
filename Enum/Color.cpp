@@ -14,7 +14,7 @@ DARK_GREEN ,
 ORANGE ,
 DARK_BLUE ,
 DARK_PINK,
-non
+none
 };
 
 //GREY "\033[90m"
