@@ -73,6 +73,7 @@ public:
     ~Plot();
 
     //METHODS
+    std::string getLegend();
     void zeroPointAxis();
     //Draws straight line parallel to x axis
     void xLine(double y);

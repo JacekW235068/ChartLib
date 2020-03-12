@@ -484,3 +484,16 @@ std::ostream& operator<<(std::ostream& s, const Plot& t){
     s<<'\n';
     return s;
 }
+
+std::string Plot::getLegend(){
+    std::string Legend;
+    //Totally readable code
+    int MaxWordLength = std::max_element(dataSets.begin(),dataSets.end(),
+    [](const PlotData& a, const PlotData& b){
+        return a.getName().length() <  b.getName().length();
+    })->get().getName().length() + 3;
+    for (PlotData& dataSet : dataSets){
+        Legend += dataSet.getName() + std::string(MaxWordLength - dataSet.getName().length(),'.') + dataSet.getStyledSymbol() + "\033[39m\n";
+    }
+    return Legend;
+}
