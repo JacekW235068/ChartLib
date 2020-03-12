@@ -256,13 +256,13 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
 }
 
 //DATA ACCESS AND MODIFICATION
-std::pair<unsigned, unsigned> Plot::getWindowSize(){
+const std::pair<unsigned, unsigned>& Plot::getWindowSize() const{
     return windowSize;
 }
-double Plot::getCellAspectRation(){
+const double& Plot::getCellAspectRation() const{
     return cellAspectRatio;
 }
-Scale Plot::getScaling(){
+const Scale& Plot::getScaling() const{
     return scale;
 }
 

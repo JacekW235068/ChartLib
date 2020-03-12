@@ -15,6 +15,7 @@ public:
     PlotDataFunction(double (*Fun)(double),
      std::pair<double,double> XRange,double Accuracy,
      char Symbol = 'o',
+     std::string Name = "",
      Color color = Color::none, 
      Style Style = Style::dots);
     void setRange(std::pair<double,double> XRange);

@@ -14,6 +14,7 @@ public:
     void modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda);
     PlotDataOrderedSet(std::list<std::pair<double, double>> DataSet = std::list<std::pair<double, double>>(),
      char Symbol = 'o',
+     std::string Name = "",
      Color color = Color::none, 
      Style Style = Style::dots,
      bool(*Compare)(const std::pair<double,double>&, const std::pair<double,double>&) = [](const std::pair<double,double> &a, const std::pair<double,double> &b){return a < b;});

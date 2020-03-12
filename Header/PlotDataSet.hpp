@@ -14,7 +14,7 @@ protected:
 public:
     virtual void setData(std::list<std::pair<double, double>> DataSet);
     virtual void modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda);
-    PlotDataSet(std::list<std::pair<double, double>> DataSet = std::list<std::pair<double, double>>(), char Symbol = 'o', Color color = Color::none, Style Style = Style::dots);
+    PlotDataSet(std::list<std::pair<double, double>> DataSet = std::list<std::pair<double, double>>(), char Symbol = 'o',std::string Name = "", Color color = Color::none, Style Style = Style::dots);
     virtual std::tuple<double,double,double,double> getRange() const;
     virtual const std::list<std::pair<double,double>>& getData() const;
     virtual ~PlotDataSet();
