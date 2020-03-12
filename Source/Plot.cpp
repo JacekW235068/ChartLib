@@ -256,13 +256,13 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
 }
 
 //DATA ACCESS AND MODIFICATION
-std::pair<unsigned, unsigned> Plot::getWindowSize(){
+const std::pair<unsigned, unsigned>& Plot::getWindowSize() const{
     return windowSize;
 }
-double Plot::getCellAspectRation(){
+const double& Plot::getCellAspectRation() const{
     return cellAspectRatio;
 }
-Scale Plot::getScaling(){
+const Scale& Plot::getScaling() const{
     return scale;
 }
 
@@ -279,6 +279,17 @@ void Plot::setScaling(Scale Scale){
 }
 
 void Plot::RemoveData(PlotData& removed){
+    auto it = ChartMap.begin();
+	while (it != ChartMap.end())
+	{
+		if (it->second == &removed.getStyledSymbol())
+		{
+			it = ChartMap.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
     //remove from reference list
     dataSets.remove_if([&removed](PlotData& data){
         return (&data == &removed);
@@ -472,4 +483,17 @@ std::ostream& operator<<(std::ostream& s, const Plot& t){
     s << "\033[39m";
     s<<'\n';
     return s;
+}
+
+std::string Plot::getLegend(){
+    std::string Legend;
+    //Totally readable code
+    int MaxWordLength = std::max_element(dataSets.begin(),dataSets.end(),
+    [](const PlotData& a, const PlotData& b){
+        return a.getName().length() <  b.getName().length();
+    })->get().getName().length() + 3;
+    for (PlotData& dataSet : dataSets){
+        Legend += dataSet.getName() + std::string(MaxWordLength - dataSet.getName().length(),'.') + dataSet.getStyledSymbol() + "\033[39m\n";
+    }
+    return Legend;
 }

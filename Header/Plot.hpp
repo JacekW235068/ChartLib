@@ -61,9 +61,9 @@ public:
     //ATTENCTION: SKETCHY AS FUCK
     void RemoveData(PlotData& removed);
     //OPTIONS ACCESS
-    std::pair<unsigned, unsigned> getWindowSize();
-    double getCellAspectRation();
-    Scale getScaling();
+    const std::pair<unsigned, unsigned>& getWindowSize() const;
+    const double& getCellAspectRation() const;
+    const Scale& getScaling() const;
     //CONSTRUCTORS and stuff
     Plot(
         std::pair<unsigned, unsigned> WindowSize,
@@ -73,6 +73,7 @@ public:
     ~Plot();
 
     //METHODS
+    std::string getLegend();
     void zeroPointAxis();
     //Draws straight line parallel to x axis
     void xLine(double y);

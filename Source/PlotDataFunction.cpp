@@ -3,9 +3,10 @@
 PlotDataFunction::PlotDataFunction(double (*Fun)(double),
      std::pair<double,double> XRange,
      double Accuracy,
-     char Symbol,
+     char Symbol
+     ,std::string Name,
      Color color, 
-     Style Style) : PlotData(Symbol, Style, color),accuracy(Accuracy), fun(Fun) {
+     Style Style) : PlotData(Symbol,Name , Style, color),accuracy(Accuracy), fun(Fun) {
          min_x = XRange.first;
          max_x= XRange.second;
          double x = min_x;

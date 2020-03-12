@@ -1,8 +1,8 @@
 #include "../Header/PlotData.hpp"
 #include "../Header/Plot.hpp"
 
-PlotData::PlotData (char Symbol, Style Style, Color Color) 
-: symbol(Symbol), style(Style), color(Color), min_x(nan("")), max_x(nan("")), min_y(nan("")), max_y(nan(""))
+PlotData::PlotData (char Symbol,std::string Name, Style Style, Color Color) 
+: symbol(Symbol), style(Style), color(Color), min_x(nan("")), max_x(nan("")), min_y(nan("")), max_y(nan("")), name(Name)
 {
     setStyledSymbol();
 }
@@ -40,23 +40,30 @@ PlotData::~PlotData(){
                 return "\033[39m";
         }
     }
-    char PlotData::getSymbol(){
+    const char& PlotData::getSymbol() const{
         return symbol;
     }
     void PlotData::setSymbol(char Symbol){
         symbol = Symbol;
         setStyledSymbol();
     }
-    Color PlotData::getColor(){
+    const Color& PlotData::getColor() const{
         return color;
     }
     void PlotData::setColor(Color Color){
         color = Color;
         setStyledSymbol();
     }
-    const std::string& PlotData::getStyledSymbol(){
+    const std::string& PlotData::getStyledSymbol() const{
         return styledSymbol;
     }
     void PlotData::setStyledSymbol(){
         styledSymbol = mapColor(color) + symbol;
     }
+
+const std::string& PlotData::getName() const{
+    return name;
+}
+void PlotData::setName(std::string Name){
+    name = Name;
+}
