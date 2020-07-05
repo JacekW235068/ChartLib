@@ -1,5 +1,5 @@
-#include "../Header/PlotData.hpp"
-#include "../Header/Plot.hpp"
+#include <PlotData.hpp>
+#include <Plot.hpp>
 
 PlotData::PlotData (char Symbol,std::string Name, Style Style, Color Color) 
 : symbol(Symbol), style(Style), color(Color), min_x(nan("")), max_x(nan("")), min_y(nan("")), max_y(nan("")), name(Name)

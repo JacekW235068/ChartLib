@@ -1,4 +1,4 @@
-#include "../Header/PlotDataFunction.hpp"
+#include <PlotDataFunction.hpp>
 
 PlotDataFunction::PlotDataFunction(double (*Fun)(double),
      std::pair<double,double> XRange,

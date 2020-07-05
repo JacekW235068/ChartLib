@@ -1,7 +1,7 @@
 #pragma once
-#include "../Enum/Style.cpp"
-#include "../Enum/Scale.cpp"
-#include "../Enum/Color.cpp"
+#include <Style.hpp>
+#include <Scale.hpp>
+#include <Color.hpp>
 #include <list>
 #include <tuple>
 #include <cmath>

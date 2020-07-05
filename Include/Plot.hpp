@@ -11,9 +11,9 @@
 #include <map>
 #include <sstream>
 
-#include "./PlotData.hpp"
-#include "../Enum/Scale.cpp"
-#include "../Enum/Style.cpp"
+#include <PlotData.hpp>
+#include <Scale.hpp>
+#include <Style.hpp>
 
 
 class Plot
