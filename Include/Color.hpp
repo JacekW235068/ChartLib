@@ -1,5 +1,5 @@
 #pragma once
-
+namespace chart{
 enum class Color{
 GREY,
 RED ,
@@ -28,3 +28,4 @@ none
 //ORANGE "\033[33m"
 //DARK_BLUE "\033[34m"
 //DARK_PINK "\033[35m"
+}

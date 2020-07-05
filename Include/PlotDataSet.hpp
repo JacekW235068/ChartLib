@@ -4,8 +4,9 @@
 #include <tuple>
 #include <cmath>
 #include <functional>
-
 #include <PlotData.hpp>
+
+namespace chart {
 
 class PlotDataSet : public PlotData
 {
@@ -20,3 +21,4 @@ public:
     virtual ~PlotDataSet();
 
 };  
+}

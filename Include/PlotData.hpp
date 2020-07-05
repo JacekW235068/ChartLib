@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Style.hpp>
 #include <Scale.hpp>
 #include <Color.hpp>
@@ -6,7 +7,7 @@
 #include <tuple>
 #include <cmath>
 #include <string>
-
+namespace chart{
 class PlotData
 {
 protected:
@@ -38,3 +39,4 @@ public:
     const std::string& getStyledSymbol() const;
 };
  
+}

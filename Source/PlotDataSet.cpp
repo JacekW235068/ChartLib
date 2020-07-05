@@ -1,7 +1,7 @@
 #include <PlotDataSet.hpp>
 
 
-
+namespace chart {
 
 PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol, std::string Name, Color color, Style Style) 
 : PlotData(Symbol, Name, Style, color), 
@@ -60,3 +60,4 @@ void PlotDataSet::modifyDataSet(std::function<void(std::list<std::pair<double, d
     max_x = nan("");
 }
 
+}
