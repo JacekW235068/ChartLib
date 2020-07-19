@@ -1,10 +1,10 @@
 #pragma once
-#include "../Enum/Style.cpp"
+#include <Style.hpp>
 #include <tuple>
 #include <cmath>
 #include <functional>
-#include "./PlotDataSet.hpp"
-
+#include <PlotDataSet.hpp>
+namespace chart{
 class PlotDataOrderedSet : public PlotDataSet
 {
 private:
@@ -21,3 +21,4 @@ public:
     std::tuple<double,double,double,double> getRange() const;
     const std::list<std::pair<double,double>>& getData() const;
 };  
+}

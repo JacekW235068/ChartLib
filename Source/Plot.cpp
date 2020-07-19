@@ -1,8 +1,8 @@
- #include "../Header/Plot.hpp"
+ #include <Plot.hpp>
 
 
 
-
+namespace chart {
 Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     Scale Scale,
     double CellAspectRatio
@@ -496,4 +496,5 @@ std::string Plot::getLegend(){
         Legend += dataSet.getName() + std::string(MaxWordLength - dataSet.getName().length(),'.') + dataSet.getStyledSymbol() + "\033[39m\n";
     }
     return Legend;
+}
 }

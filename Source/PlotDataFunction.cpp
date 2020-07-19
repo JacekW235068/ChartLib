@@ -1,4 +1,8 @@
-#include "../Header/PlotDataFunction.hpp"
+#include <PlotDataFunction.hpp>
+
+
+
+namespace chart {
 
 PlotDataFunction::PlotDataFunction(double (*Fun)(double),
      std::pair<double,double> XRange,
@@ -87,4 +91,5 @@ void PlotDataFunction::setAccuracy(double Accuracy){
 }
 double PlotDataFunction::getAccuracy(){
      return accuracy;
+}
 }

@@ -1,11 +1,12 @@
 #pragma once
-#include "../Enum/Style.cpp"
+#include <Style.hpp>
 #include <vector>
 #include <tuple>
 #include <cmath>
 #include <functional>
+#include <PlotData.hpp>
 
-#include "./PlotData.hpp"
+namespace chart {
 
 class PlotDataSet : public PlotData
 {
@@ -20,3 +21,4 @@ public:
     virtual ~PlotDataSet();
 
 };  
+}

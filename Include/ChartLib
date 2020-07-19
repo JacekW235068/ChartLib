@@ -1,0 +1,9 @@
+#pragma once
+#include <Color.hpp>
+#include <Style.hpp>
+#include <Scale.hpp>
+#include <Plot.hpp>
+#include <PlotData.hpp>
+#include <PlotDataSet.hpp>
+#include <PlotDataOrderedSet.hpp>
+#include <PlotDataFunction.hpp>

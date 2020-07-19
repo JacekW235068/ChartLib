@@ -1,10 +1,11 @@
 #pragma once
-#include "../Enum/Style.cpp"
+#include <Style.hpp>
 #include <tuple>
 #include <cmath>
 #include <functional>
-#include "./PlotData.hpp"
-
+#include <PlotData.hpp>
+namespace chart{
+    
 class PlotDataFunction : public PlotData
 {
 protected:
@@ -25,3 +26,4 @@ public:
     double getAccuracy();
     void setAccuracy(double Accuracy);
 };  
+}

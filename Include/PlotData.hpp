@@ -1,12 +1,13 @@
 #pragma once
-#include "../Enum/Style.cpp"
-#include "../Enum/Scale.cpp"
-#include "../Enum/Color.cpp"
+
+#include <Style.hpp>
+#include <Scale.hpp>
+#include <Color.hpp>
 #include <list>
 #include <tuple>
 #include <cmath>
 #include <string>
-
+namespace chart{
 class PlotData
 {
 protected:
@@ -38,3 +39,4 @@ public:
     const std::string& getStyledSymbol() const;
 };
  
+}

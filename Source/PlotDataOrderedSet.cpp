@@ -1,8 +1,8 @@
-#include "../Header/PlotDataOrderedSet.hpp"
+#include <PlotDataOrderedSet.hpp>
 
 
 
-
+namespace chart {
 PlotDataOrderedSet::PlotDataOrderedSet(std::list<std::pair<double, double>> DataSet, char Symbol, std::string Name, Color color, Style Style, bool(*Compare)(const std::pair<double,double>&, const std::pair<double,double>&)) 
 : PlotDataSet(DataSet, Symbol, Name, color, Style), 
 compare(Compare){
@@ -53,3 +53,4 @@ void PlotDataOrderedSet::modifyDataSet(std::function<void(std::list<std::pair<do
     max_x = nan("");
 }
 
+}
