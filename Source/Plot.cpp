@@ -16,14 +16,19 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
 Plot::~Plot()
 {
 }
-void Plot::addDataSet(PlotData& plot){
-    dataSets.push_back(plot);
+void Plot::addDataSet(PlotData& plotData){
+    dataSets.push_back(plotData);
+    plotData.plots.push_back(*this);
+
+}
+void Plot::setValueRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
+    visible_min_x = Xrange.first;
+    visible_max_x = Xrange.second;
+    visible_min_y = Yrange.first;
+    visible_max_y = Yrange.second;
 }
 
-
-void Plot::createChart(double center){
-    //calculate visible value range, set limits
-    getRange();
+void Plot::setValueRange(Scale scaling, double center){
     switch (scale)
     {
     case Scale::AlignToX:
@@ -32,37 +37,14 @@ void Plot::createChart(double center){
     case Scale::AlignToY:
         valueRange_scaley(center);
         break;    
-    default:
+    case Scale::stretch:
         valueRange_stretch();
         break;
     }
-    ChartMap.clear();
-    //draw chart
-    for (PlotData& dataSet : dataSets)
-    switch (dataSet.style)
-    {
-    case Style::Linear:
-        drawLines(dataSet);
-        break;
-    default:
-        drawDots(dataSet);
-        break;
-    }
-    noFrame();
-
-
 }
 
-void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
-    //calculate visible value range, set limits
-    if (Xrange.first >= Xrange.second || Yrange.first >= Yrange.second)
-        return; //should probably throw here
-    visible_min_x = Xrange.first;
-    visible_max_x = Xrange.second;
-    visible_min_y = Yrange.first;
-    visible_max_y = Yrange.second;
+void Plot::createChart(){
     ChartMap.clear();
-    //draw chart
     for (PlotData& dataSet : dataSets)
     switch (dataSet.style)
     {
@@ -73,7 +55,6 @@ void Plot::createChart(std::pair<double,double> Xrange, std::pair<double,double>
         drawDots(dataSet);
         break;
     }
-    noFrame();
 }
 
 void Plot::clearChart(){
@@ -278,7 +259,9 @@ void Plot::setScaling(Scale Scale){
 
 }
 
-void Plot::RemoveData(PlotData& removed){
+
+
+void Plot::removeDataSet(PlotData& removed){
     auto it = ChartMap.begin();
 	while (it != ChartMap.end())
 	{
@@ -290,9 +273,11 @@ void Plot::RemoveData(PlotData& removed){
 			++it;
 		}
 	}
-    //remove from reference list
     dataSets.remove_if([&removed](PlotData& data){
         return (&data == &removed);
+    });
+    removed.plots.remove_if([&](Plot& plot){
+        return (&plot == this);
     });
 }
 

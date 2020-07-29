@@ -48,9 +48,9 @@ private:
     void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol);
     
     std::tuple<double,double,double,double> getRange();
-    //DataModification
 public:
-
+    void setValueRange(Scale scaling, double center = nan(""));
+    void setValueRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
     //OPTIONS MODIFICATION
     //Requires Recreating chart!!!
     void setWindowSize(std::pair<unsigned, unsigned> WindowSize);
@@ -59,7 +59,7 @@ public:
     //Requires Recreating chart!!!
     void setScaling(Scale Scale);
     //ATTENCTION: SKETCHY AS FUCK
-    void RemoveData(PlotData& removed);
+    void removeDataSet(PlotData& removed);
     //OPTIONS ACCESS
     const std::pair<unsigned, unsigned>& getWindowSize() const;
     const double& getCellAspectRation() const;
@@ -85,11 +85,12 @@ public:
     void simpleFrame();
     void axisFrame(int Xprecission = 0, int Yprecission = 0);
     void clearChart();
-    void createChart(double center = nan(""));
-    void createChart(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
+    void createChart();
+
     void addDataSet(PlotData& plot);
 
     //FRIENDS AND STUFF
     friend std::ostream& operator<<(std::ostream& s, const Plot& t);
+    friend PlotData::~PlotData();
 };
 }
