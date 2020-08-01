@@ -88,7 +88,10 @@ public:
     void createChart();
 
     void addDataSet(PlotData& plot);
-
+    void addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData);
+    void addDataSets(std::list<std::reference_wrapper<PlotData>> plotData);
+    void addDataSets(std::vector<PlotData*> plotData);
+    void addDataSets(std::list<PlotData*> plotData);
     //FRIENDS AND STUFF
     friend std::ostream& operator<<(std::ostream& s, const Plot& t);
     friend PlotData::~PlotData();

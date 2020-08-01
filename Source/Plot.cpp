@@ -9,7 +9,11 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     ) :
     windowSize(WindowSize),
     scale(Scale),
-    cellAspectRatio(CellAspectRatio)
+    cellAspectRatio(CellAspectRatio),
+    visible_min_x(nan("")),
+    visible_max_x(nan("")),
+    visible_min_y(nan("")),
+    visible_max_y(nan(""))
 {
     dataSets = std::list<std::reference_wrapper<PlotData>>();
 }
@@ -19,8 +23,77 @@ Plot::~Plot()
 void Plot::addDataSet(PlotData& plotData){
     dataSets.push_back(plotData);
     plotData.plots.push_back(*this);
-
+    switch (plotData.style)
+    {
+        case Style::Linear:
+            drawLines(plotData);
+            break;
+        default:
+            drawDots(plotData);
+            break;
+    }
 }
+void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData){
+    for (PlotData& dataSet : plotData){
+        dataSets.push_back(dataSet);
+        dataSet.plots.push_back(*this);
+        switch (dataSet.style)
+        {
+            case Style::Linear:
+                drawLines(dataSet);
+                break;
+            default:
+                drawDots(dataSet);
+                break;
+        }
+    }
+}
+void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>> plotData){
+    for (PlotData& dataSet : plotData){
+        dataSets.push_back(dataSet);
+        dataSet.plots.push_back(*this);
+        switch (dataSet.style)
+        {
+            case Style::Linear:
+                drawLines(dataSet);
+                break;
+            default:
+                drawDots(dataSet);
+                break;
+        }
+    }
+}
+void Plot::addDataSets(std::vector<PlotData*> plotData){
+    for (PlotData* dataSet : plotData){
+        dataSets.push_back(*dataSet);
+        dataSet->plots.push_back(*this);
+        switch (dataSet->style)
+        {
+            case Style::Linear:
+                drawLines(*dataSet);
+                break;
+            default:
+                drawDots(*dataSet);
+                break;
+        }
+    }
+}
+void Plot::addDataSets(std::list<PlotData*> plotData){
+    for (PlotData* dataSet : plotData){
+        dataSets.push_back(*dataSet);
+        dataSet->plots.push_back(*this);
+        switch (dataSet->style)
+        {
+            case Style::Linear:
+                drawLines(*dataSet);
+                break;
+            default:
+                drawDots(*dataSet);
+                break;
+        }
+    }
+}
+
 void Plot::setValueRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
     visible_min_x = Xrange.first;
     visible_max_x = Xrange.second;
@@ -42,26 +115,6 @@ void Plot::setValueRange(Scale scaling, double center){
         break;
     }
 }
-
-void Plot::createChart(){
-    ChartMap.clear();
-    for (PlotData& dataSet : dataSets)
-    switch (dataSet.style)
-    {
-    case Style::Linear:
-        drawLines(dataSet);
-        break;
-    default:
-        drawDots(dataSet);
-        break;
-    }
-}
-
-void Plot::clearChart(){
-    ChartMap.clear();
-    frame.clear();
-}
-
 
 void Plot::valueRange_stretch(){
     auto [min_x,max_x,min_y,max_y] = getRange();
@@ -124,6 +177,8 @@ void Plot::valueRange_scalex(double center){
 }
 
 void Plot::drawDots(PlotData& DataSet){
+    if (std::isnan(visible_min_x) or std::isnan(visible_max_x) or std::isnan(visible_min_y) or std::isnan(visible_max_y))
+        return;
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
     
@@ -141,6 +196,8 @@ void Plot::drawDots(PlotData& DataSet){
 }
 
 void Plot::drawLines(PlotData& plotData){
+    if (std::isnan(visible_min_x) or std::isnan(visible_max_x) or std::isnan(visible_min_y) or std::isnan(visible_max_y))
+        return;
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
     auto& dataSet = plotData.getData();
@@ -397,52 +454,7 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
     frame.push_back(xAxisMarks+xAxis);
 }
 
-void Plot::zeroPointAxis(){
-    const static std::string xSymbol= u8"\033[39m•";
-    const static std::string ySymbol = u8"\033[39m•";
-    int YAxis = static_cast<int>(round((visible_max_y)/(visible_max_y-visible_min_y)*(windowSize.second-1)));
-    int XAxis = static_cast<int>(round((-visible_min_x)/(visible_max_x-visible_min_x)*(windowSize.first-1)));
-        if(XAxis >= 0 && XAxis < windowSize.first){
-            for(int y = 0; y < windowSize.second; y++){
-                ChartMap.insert({std::make_pair(y,XAxis), &xSymbol});
-            }
-        }
-        if(YAxis >= 0 && YAxis < windowSize.second){
-            for(int x = 0; x < windowSize.first; x++){
-                ChartMap.insert({std::make_pair(YAxis,x), &ySymbol});
-            }
-        }
-}
 
-void Plot::yLine(double x){
-    const static std::string symbol= u8"\033[39m•";
-    int XAxis = static_cast<int>(round((x-visible_min_x)/(visible_max_x-visible_min_x)*(windowSize.first-1)));
-        if(XAxis >= 0 && XAxis < windowSize.first){
-            for(int y = 0; y < windowSize.second; y++){
-                ChartMap.insert({std::make_pair(y,XAxis), &symbol});
-            }
-        }
-}
-void Plot::xLine(double y){
-    const static std::string symbol= u8"\033[39m•";
-    int YAxis = static_cast<int>(round((visible_max_y-y)/(visible_max_y-visible_min_y)*(windowSize.second-1)));
-    if(YAxis >= 0 && YAxis < windowSize.second){
-            for(int x = 0; x < windowSize.first; x++){
-                ChartMap.insert({std::make_pair(YAxis,x), &symbol});
-            }
-        }
-}
-
-void Plot::minmaxY(PlotData& data){
-    auto [discardd,discard,miny,maxy] = data.getRange(); 
-    xLine(miny);
-    xLine(maxy);
-}
-void Plot::minmaxX(PlotData& data){
-    auto [minx,maxx,discardd,discard] = data.getRange(); 
-    yLine(minx);
-    yLine(maxx);
-}
 //operators
 std::ostream& operator<<(std::ostream& s, const Plot& t){ 
     auto map_it = t.ChartMap.begin();
