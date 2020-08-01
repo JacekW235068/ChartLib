@@ -4,11 +4,9 @@
 
 namespace chart {
 Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
-    Scale Scale,
     double CellAspectRatio
     ) :
     windowSize(WindowSize),
-    scale(Scale),
     cellAspectRatio(CellAspectRatio),
     visible_min_x(nan("")),
     visible_max_x(nan("")),
@@ -21,6 +19,10 @@ Plot::~Plot()
 {
 }
 void Plot::addDataSet(PlotData& plotData){
+    if (find_if(dataSets.begin(),dataSets.end(),[&plotData](PlotData& data){
+        return (&data == &plotData);
+    }) != dataSets.end())
+        return;
     dataSets.push_back(plotData);
     plotData.plots.push_back(*this);
     switch (plotData.style)
@@ -35,6 +37,10 @@ void Plot::addDataSet(PlotData& plotData){
 }
 void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData){
     for (PlotData& dataSet : plotData){
+        if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
+            return (&data == &dataSet);
+            }) != dataSets.end())
+            continue;
         dataSets.push_back(dataSet);
         dataSet.plots.push_back(*this);
         switch (dataSet.style)
@@ -50,6 +56,10 @@ void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData){
 }
 void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>> plotData){
     for (PlotData& dataSet : plotData){
+        if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
+            return (&data == &dataSet);
+            }) != dataSets.end())
+            continue;
         dataSets.push_back(dataSet);
         dataSet.plots.push_back(*this);
         switch (dataSet.style)
@@ -65,6 +75,10 @@ void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>> plotData){
 }
 void Plot::addDataSets(std::vector<PlotData*> plotData){
     for (PlotData* dataSet : plotData){
+        if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
+            return (&data == dataSet);
+            }) != dataSets.end())
+            continue;
         dataSets.push_back(*dataSet);
         dataSet->plots.push_back(*this);
         switch (dataSet->style)
@@ -80,6 +94,10 @@ void Plot::addDataSets(std::vector<PlotData*> plotData){
 }
 void Plot::addDataSets(std::list<PlotData*> plotData){
     for (PlotData* dataSet : plotData){
+        if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
+            return (&data == dataSet);
+            }) != dataSets.end())
+            continue;
         dataSets.push_back(*dataSet);
         dataSet->plots.push_back(*this);
         switch (dataSet->style)
@@ -99,10 +117,22 @@ void Plot::setValueRange(std::pair<double,double> Xrange, std::pair<double,doubl
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
+
+    for (PlotData& dataSet : dataSets){
+        switch (dataSet.style)
+        {
+            case Style::Linear:
+                drawLines(dataSet);
+                break;
+            default:
+                drawDots(dataSet);
+                break;
+        }
+    }
 }
 
 void Plot::setValueRange(Scale scaling, double center){
-    switch (scale)
+    switch (scaling)
     {
     case Scale::AlignToX:
         valueRange_scalex(center);
@@ -113,6 +143,18 @@ void Plot::setValueRange(Scale scaling, double center){
     case Scale::stretch:
         valueRange_stretch();
         break;
+    }
+
+    for (PlotData& dataSet : dataSets){
+        switch (dataSet.style)
+        {
+            case Style::Linear:
+                drawLines(dataSet);
+                break;
+            default:
+                drawDots(dataSet);
+                break;
+        }
     }
 }
 

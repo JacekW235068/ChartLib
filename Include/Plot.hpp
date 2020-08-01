@@ -67,7 +67,6 @@ public:
     //CONSTRUCTORS and stuff
     Plot(
         std::pair<unsigned, unsigned> WindowSize,
-        Scale Scale = Scale::stretch,
         double CellAspectRatio = 0.5
         );
     ~Plot();
