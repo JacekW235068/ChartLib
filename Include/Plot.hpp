@@ -1,21 +1,22 @@
 #pragma once
-
-#include <utility>
-#include <vector>
-#include <list>
-#include <algorithm>
-#include <iostream>
-#include <cmath>
-#include <tuple>
-#include <memory>
-#include <map>
-#include <sstream>
-
 #include <PlotData.hpp>
 #include <Scale.hpp>
-#include <Style.hpp>
 
+#include <vector>
+#include <list>
+#include <iostream>
+#include <tuple>
+#include <map>
+
+
+
+/**
+ * ChartLib namespace
+ *
+ * Read more at https://github.com/JacekW235068/ChartLib/blob/master/README.md
+ */
 namespace chart {
+
 /**
  * Main class implementing terminal chart.
  *
@@ -91,9 +92,9 @@ public:
      */
     void setVisibleRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
 
-    void noFrame();
-    void simpleFrame();
-    void axisFrame(int Xprecission = 0, int Yprecission = 0);
+    void noFrame(); //To bo removed
+    void simpleFrame(); //To bo removed
+    void axisFrame(int Xprecission = 0, int Yprecission = 0); //To bo removed
 
     /**
      * Adds dataset to chart and prints it right away if visible range is set.
@@ -102,29 +103,33 @@ public:
      */
     void addDataSet(PlotData& plotData);
     /**
+     * @overload
      * Adds datasets to chart and prints them right away if visible range is set.
      *
      * @param plotData `vector` of datasets references to include in chart
      */
-    void addDataSets(std::vector<std::reference_wrapper<PlotData>>& plotData);
+    void addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData);
     /**
+     * @overload
      * Adds datasets to chart and prints them right away if visible range is set.
      *
      * @param plotData `list` of datasets references to include in chart
      */
-    void addDataSets(std::list<std::reference_wrapper<PlotData>>& plotData);
+    void addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData);
     /**
+     * @overload
      * Adds datasets to chart and prints them right away if visible range is set.
      *
      * @param plotData `vector` of datasets pointers to include in chart
      */
-    void addDataSets(std::vector<PlotData*>& plotData);
+    void addDataSet(std::vector<PlotData*>& plotData);
     /**
+     * @overload
      * Adds datasets to chart and prints them right away if visible range is set.
      *
      * @param plotData `list` of datasets pointers to include in chart
      */
-    void addDataSets(std::list<PlotData*>& plotData);
+    void addDataSet(std::list<PlotData*>& plotData);
     /**
      * Removes a single dataset from chart
      *

@@ -1,6 +1,7 @@
 #include <PlotData.hpp>
 #include <Plot.hpp>
 
+#include <memory>
 
 namespace chart {
 

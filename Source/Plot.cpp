@@ -1,6 +1,7 @@
- #include <Plot.hpp>
+#include <Plot.hpp>
 
-
+#include <memory>
+#include <algorithm>
 
 namespace chart {
 Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
@@ -35,7 +36,7 @@ void Plot::addDataSet(PlotData& plotData){
             break;
     }
 }
-void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>>& plotData){
+void Plot::addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
             return (&data == &dataSet);
@@ -54,7 +55,7 @@ void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>>& plotData){
         }
     }
 }
-void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>>& plotData){
+void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
             return (&data == &dataSet);
@@ -73,7 +74,7 @@ void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>>& plotData){
         }
     }
 }
-void Plot::addDataSets(std::vector<PlotData*>& plotData){
+void Plot::addDataSet(std::vector<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
             return (&data == dataSet);
@@ -92,7 +93,7 @@ void Plot::addDataSets(std::vector<PlotData*>& plotData){
         }
     }
 }
-void Plot::addDataSets(std::list<PlotData*>& plotData){
+void Plot::addDataSet(std::list<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
             return (&data == dataSet);
