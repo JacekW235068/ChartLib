@@ -16,54 +16,42 @@
 #include <Style.hpp>
 
 namespace chart {
+/**
+ * Main class implementing terminal chart.
+ *
+ * Contains datasets and is capable of printing them in given visibile range
+ *
+ */
 class Plot
 {
 private:
+
     //DATA
-    //Style style;
-    Scale scale;
     double cellAspectRatio;
     std::pair<unsigned, unsigned> windowSize;
-    //symbol used for drawing chart
-    //char symbol;
     std::list<std::reference_wrapper<PlotData>> dataSets;
     //range of chart
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
     double visible_max_x;
-    std::list<std::string> frame;
+    std::list<std::string> frame; //To bo removed
     //map with coords !(Y,X)! and symbols to draw onto chart 
     std::map<std::pair<int,int>, const std::string*> ChartMap;
 
     //METHODS
     //scaling methods, sets visible range
-    void valueRange_scalex(double center);
-    void valueRange_scaley(double center);
-    void valueRange_stretch();
-    //Style methods, "draws" symbol onto printable data
+    void visibleRange_scalex(double center);
+    void visibleRange_scaley(double center);
+    void visibleRange_stretch();
+    //"draws" symbols and saves them in map
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& plotData);
     //Draw line between p1 and p2
     void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol);
     
-    std::tuple<double,double,double,double> getRange();
 public:
-    void setValueRange(Scale scaling, double center = nan(""));
-    void setValueRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
-    //OPTIONS MODIFICATION
-    //Requires Recreating chart!!!
-    void setWindowSize(std::pair<unsigned, unsigned> WindowSize);
-    //Requires Recreating chart!!!
-    void setCellAspectratio(double CellAspectRatio);
-    //Requires Recreating chart!!!
-    void setScaling(Scale Scale);
-    //ATTENCTION: SKETCHY AS FUCK
-    void removeDataSet(PlotData& removed);
-    //OPTIONS ACCESS
-    const std::pair<unsigned, unsigned>& getWindowSize() const;
-    const double& getCellAspectRation() const;
-    const Scale& getScaling() const;
+
     //CONSTRUCTORS and stuff
     Plot(
         std::pair<unsigned, unsigned> WindowSize,
@@ -72,27 +60,80 @@ public:
     ~Plot();
 
     //METHODS
+
+
+
+    //GET-SET
+    //Imma let you guess what it does
+    const std::pair<unsigned, unsigned>& getWindowSize() const;
+    //Imma let you guess what it does
+    const double& getCellAspectRatio() const;
+    /**
+     * @return Legend generated based on names and symbols of included datasets
+     */
     std::string getLegend();
-    void zeroPointAxis();
-    //Draws straight line parallel to x axis
-    void xLine(double y);
-    //Draws straight line parallel to y axis
-    void yLine(double x);
-    void minmaxY(PlotData& data);
-    void minmaxX(PlotData& data);
+    /**
+     * @return `[min_x,max_x,min_y,max_y]` min max values of all included datasets combined in format
+     */
+    std::tuple<double,double,double,double> getRange();
+    /**
+     * Sets visible range.
+     *
+     * @param scaling Enum with options for automatic scaling.
+     * @param center With `AlignToX` option defines where Y center will be, defaults to avg.
+     */
+    void setVisibleRange(Scale scaling, double center = nan(""));
+    /**
+     * Sets visible range.
+     *
+     * @param Xrange Min-Max pair of X values
+     * @param Yrange Min-Max pair of Y values
+     */
+    void setVisibleRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
+
     void noFrame();
     void simpleFrame();
     void axisFrame(int Xprecission = 0, int Yprecission = 0);
-    void clearChart();
-    void createChart();
 
-    void addDataSet(PlotData& plot);
-    void addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData);
-    void addDataSets(std::list<std::reference_wrapper<PlotData>> plotData);
-    void addDataSets(std::vector<PlotData*> plotData);
-    void addDataSets(std::list<PlotData*> plotData);
+    /**
+     * Adds dataset to chart and prints it right away if visible range is set.
+     *
+     * @param plotData reference to single dataset.
+     */
+    void addDataSet(PlotData& plotData);
+    /**
+     * Adds datasets to chart and prints them right away if visible range is set.
+     *
+     * @param plotData `vector` of datasets references to include in chart
+     */
+    void addDataSets(std::vector<std::reference_wrapper<PlotData>>& plotData);
+    /**
+     * Adds datasets to chart and prints them right away if visible range is set.
+     *
+     * @param plotData `list` of datasets references to include in chart
+     */
+    void addDataSets(std::list<std::reference_wrapper<PlotData>>& plotData);
+    /**
+     * Adds datasets to chart and prints them right away if visible range is set.
+     *
+     * @param plotData `vector` of datasets pointers to include in chart
+     */
+    void addDataSets(std::vector<PlotData*>& plotData);
+    /**
+     * Adds datasets to chart and prints them right away if visible range is set.
+     *
+     * @param plotData `list` of datasets pointers to include in chart
+     */
+    void addDataSets(std::list<PlotData*>& plotData);
+    /**
+     * Removes a single dataset from chart
+     *
+     * @param removed reference to the **exact** dataset that is to be removed.
+     */
+    void removeDataSet(PlotData& removed);
+
     //FRIENDS AND STUFF
     friend std::ostream& operator<<(std::ostream& s, const Plot& t);
-    friend PlotData::~PlotData();
+    friend PlotData::~PlotData();//please someone delete this line after I die, I don't want anyone seeing it.
 };
 }

@@ -35,7 +35,7 @@ void Plot::addDataSet(PlotData& plotData){
             break;
     }
 }
-void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData){
+void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
             return (&data == &dataSet);
@@ -54,7 +54,7 @@ void Plot::addDataSets(std::vector<std::reference_wrapper<PlotData>> plotData){
         }
     }
 }
-void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>> plotData){
+void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
             return (&data == &dataSet);
@@ -73,7 +73,7 @@ void Plot::addDataSets(std::list<std::reference_wrapper<PlotData>> plotData){
         }
     }
 }
-void Plot::addDataSets(std::vector<PlotData*> plotData){
+void Plot::addDataSets(std::vector<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
             return (&data == dataSet);
@@ -92,7 +92,7 @@ void Plot::addDataSets(std::vector<PlotData*> plotData){
         }
     }
 }
-void Plot::addDataSets(std::list<PlotData*> plotData){
+void Plot::addDataSets(std::list<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
         if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
             return (&data == dataSet);
@@ -112,7 +112,7 @@ void Plot::addDataSets(std::list<PlotData*> plotData){
     }
 }
 
-void Plot::setValueRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
+void Plot::setVisibleRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
     visible_min_x = Xrange.first;
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
@@ -131,17 +131,17 @@ void Plot::setValueRange(std::pair<double,double> Xrange, std::pair<double,doubl
     }
 }
 
-void Plot::setValueRange(Scale scaling, double center){
+void Plot::setVisibleRange(Scale scaling, double center){
     switch (scaling)
     {
     case Scale::AlignToX:
-        valueRange_scalex(center);
+        visibleRange_scalex(center);
         break;
     case Scale::AlignToY:
-        valueRange_scaley(center);
+        visibleRange_scaley(center);
         break;    
     case Scale::stretch:
-        valueRange_stretch();
+        visibleRange_stretch();
         break;
     }
 
@@ -158,7 +158,7 @@ void Plot::setValueRange(Scale scaling, double center){
     }
 }
 
-void Plot::valueRange_stretch(){
+void Plot::visibleRange_stretch(){
     auto [min_x,max_x,min_y,max_y] = getRange();
     //set limits
     visible_min_y = min_y;
@@ -176,7 +176,7 @@ void Plot::valueRange_stretch(){
     }
 }
 
-void Plot::valueRange_scaley(double center){
+void Plot::visibleRange_scaley(double center){
     auto [min_x,max_x,min_y,max_y] = getRange();
     if (std::isnan(center))
         center = (max_x+min_x)/2;
@@ -197,7 +197,7 @@ void Plot::valueRange_scaley(double center){
 }
 
 
-void Plot::valueRange_scalex(double center){
+void Plot::visibleRange_scalex(double center){
     auto [min_x,max_x,min_y,max_y] = getRange();
     if (std::isnan(center))
         center = (max_y+min_y)/2;
@@ -339,26 +339,9 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
 const std::pair<unsigned, unsigned>& Plot::getWindowSize() const{
     return windowSize;
 }
-const double& Plot::getCellAspectRation() const{
+const double& Plot::getCellAspectRatio() const{
     return cellAspectRatio;
 }
-const Scale& Plot::getScaling() const{
-    return scale;
-}
-
-void Plot::setWindowSize(std::pair<unsigned, unsigned> WindowSize){
-    windowSize = WindowSize;
-}
-void Plot::setCellAspectratio(double CellAspectRatio){
-    cellAspectRatio = CellAspectRatio;
-
-}
-void Plot::setScaling(Scale Scale){
-    scale = Scale;
-
-}
-
-
 
 void Plot::removeDataSet(PlotData& removed){
     auto it = ChartMap.begin();
