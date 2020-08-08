@@ -8,6 +8,9 @@
 #include <cmath>
 #include <string>
 namespace chart{
+
+class Plot;
+
 class PlotData
 {
 protected:
@@ -22,6 +25,7 @@ protected:
     std::string styledSymbol;
     static std::string mapColor(Color color);
     void setStyledSymbol();
+    std::list<std::reference_wrapper<Plot>> plots;
 public:
     char symbol;
     //line,dots, that kinda stuff
@@ -37,6 +41,7 @@ public:
     const Color& getColor() const;
     void setColor(Color Color);
     const std::string& getStyledSymbol() const;
+    friend class Plot;
 };
  
 }
