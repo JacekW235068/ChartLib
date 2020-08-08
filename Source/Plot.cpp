@@ -18,6 +18,11 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
 }
 Plot::~Plot()
 {
+    for (auto& data : dataSets){
+        data.get().plots.remove_if([&](Plot& plot){
+        return (&plot == this);
+        });
+    }
 }
 void Plot::addDataSet(PlotData& plotData){
     if (find_if(dataSets.begin(),dataSets.end(),[&plotData](PlotData& data){
