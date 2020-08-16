@@ -4,7 +4,7 @@
 #include <algorithm>
 
 namespace chart {
-Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
+Plot::Plot(std::pair<uint16_t, uint16_t> WindowSize,
     double CellAspectRatio
     ) :
     windowSize(WindowSize),
@@ -223,8 +223,8 @@ void Plot::drawDots(PlotData& DataSet){
     for(const auto& data : DataSet.getData()){
         if(data.first >= visible_min_x && data.first <= visible_max_x &&
 	    data.second >= visible_min_y && data.second <= visible_max_y ){
-            int y = static_cast<int>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
-            int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
+            int y = static_cast<uint16_t>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
+            int x =static_cast<uint16_t>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
             ChartMap[{y, x}] = &DataSet.getStyledSymbol();
   	    }
     }

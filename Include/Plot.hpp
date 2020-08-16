@@ -29,7 +29,7 @@ private:
 
     //DATA
     double cellAspectRatio;
-    std::pair<unsigned, unsigned> windowSize;
+    std::pair<uint16_t, uint16_t> windowSize;
     std::list<PlotData*> dataSets;
     //range of chart
     double visible_min_y;
@@ -38,7 +38,7 @@ private:
     double visible_max_x;
     std::list<std::string> frame; //To bo removed
     //map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<int,int>, const std::string*> ChartMap;
+    std::map<std::pair<uint16_t,uint16_t>, const std::string*> ChartMap;
 
     //METHODS
     //scaling methods, sets visible range
@@ -55,7 +55,7 @@ public:
 
     //CONSTRUCTORS and stuff
     Plot(
-        std::pair<unsigned, unsigned> WindowSize,
+        std::pair<uint16_t, uint16_t> WindowSize,
         double CellAspectRatio = 0.5
         );
     ~Plot();
