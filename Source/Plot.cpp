@@ -14,23 +14,18 @@ Plot::Plot(std::pair<unsigned, unsigned> WindowSize,
     visible_min_y(nan("")),
     visible_max_y(nan(""))
 {
-    dataSets = std::list<std::reference_wrapper<PlotData>>();
 }
 Plot::~Plot()
 {
-    for (auto& data : dataSets){
-        data.get().plots.remove_if([&](Plot& plot){
-        return (&plot == this);
-        });
+    for (PlotData* data : dataSets){
+        data->plots.remove(this);
     }
 }
 void Plot::addDataSet(PlotData& plotData){
-    if (find_if(dataSets.begin(),dataSets.end(),[&plotData](PlotData& data){
-        return (&data == &plotData);
-    }) != dataSets.end())
+    if (std::find(dataSets.begin(),dataSets.end(),&plotData) != dataSets.end())
         return;
-    dataSets.push_back(plotData);
-    plotData.plots.push_back(*this);
+    dataSets.push_back(&plotData);
+    plotData.plots.push_back(this);
     switch (plotData.style)
     {
         case Style::Linear:
@@ -43,12 +38,10 @@ void Plot::addDataSet(PlotData& plotData){
 }
 void Plot::addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
-        if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
-            return (&data == &dataSet);
-            }) != dataSets.end())
+        if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
             continue;
-        dataSets.push_back(dataSet);
-        dataSet.plots.push_back(*this);
+        dataSets.push_back(&dataSet);
+        dataSet.plots.push_back(this);
         switch (dataSet.style)
         {
             case Style::Linear:
@@ -62,12 +55,10 @@ void Plot::addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData){
 }
 void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
-        if (find_if(dataSets.begin(),dataSets.end(),[&dataSet](PlotData& data){
-            return (&data == &dataSet);
-            }) != dataSets.end())
+        if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
             continue;
-        dataSets.push_back(dataSet);
-        dataSet.plots.push_back(*this);
+        dataSets.push_back(&dataSet);
+        dataSet.plots.push_back(this);
         switch (dataSet.style)
         {
             case Style::Linear:
@@ -81,12 +72,10 @@ void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
 }
 void Plot::addDataSet(std::vector<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
-        if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
-            return (&data == dataSet);
-            }) != dataSets.end())
+        if (std::find(dataSets.begin(),dataSets.end(),dataSet) != dataSets.end())
             continue;
-        dataSets.push_back(*dataSet);
-        dataSet->plots.push_back(*this);
+        dataSets.push_back(dataSet);
+        dataSet->plots.push_back(this);
         switch (dataSet->style)
         {
             case Style::Linear:
@@ -100,12 +89,10 @@ void Plot::addDataSet(std::vector<PlotData*>& plotData){
 }
 void Plot::addDataSet(std::list<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
-        if (find_if(dataSets.begin(),dataSets.end(),[dataSet](PlotData& data){
-            return (&data == dataSet);
-            }) != dataSets.end())
+        if (std::find(dataSets.begin(),dataSets.end(),dataSet) != dataSets.end())
             continue;
-        dataSets.push_back(*dataSet);
-        dataSet->plots.push_back(*this);
+        dataSets.push_back(dataSet);
+        dataSet->plots.push_back(this);
         switch (dataSet->style)
         {
             case Style::Linear:
@@ -124,14 +111,14 @@ void Plot::setVisibleRange(std::pair<double,double> Xrange, std::pair<double,dou
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
 
-    for (PlotData& dataSet : dataSets){
-        switch (dataSet.style)
+    for (PlotData* dataSet : dataSets){
+        switch (dataSet->style)
         {
             case Style::Linear:
-                drawLines(dataSet);
+                drawLines(*dataSet);
                 break;
             default:
-                drawDots(dataSet);
+                drawDots(*dataSet);
                 break;
         }
     }
@@ -151,14 +138,14 @@ void Plot::setVisibleRange(Scale scaling, double center){
         break;
     }
 
-    for (PlotData& dataSet : dataSets){
-        switch (dataSet.style)
+    for (PlotData* dataSet : dataSets){
+        switch (dataSet->style)
         {
             case Style::Linear:
-                drawLines(dataSet);
+                drawLines(*dataSet);
                 break;
             default:
-                drawDots(dataSet);
+                drawDots(*dataSet);
                 break;
         }
     }
@@ -361,12 +348,8 @@ void Plot::removeDataSet(PlotData& removed){
 			++it;
 		}
 	}
-    dataSets.remove_if([&removed](PlotData& data){
-        return (&data == &removed);
-    });
-    removed.plots.remove_if([&](Plot& plot){
-        return (&plot == this);
-    });
+    dataSets.remove(&removed);
+    removed.plots.remove(this);
 }
 
 
@@ -376,8 +359,8 @@ std::tuple<double,double,double,double> Plot::getRange(){
     double min_y = __DBL_MAX__;
     double max_x = __DBL_MIN__;
     double max_y = __DBL_MIN__;
-    for(PlotData& data : dataSets){
-        auto range = data.getRange();
+    for(PlotData* data : dataSets){
+        auto range = data->getRange();
         if (std::isnan(std::get<0>(range)))
             break;
         if(std::get<0>(range) < min_x)
@@ -516,12 +499,13 @@ std::ostream& operator<<(std::ostream& s, const Plot& t){
 std::string Plot::getLegend(){
     std::string Legend;
     //Totally readable code
-    int MaxWordLength = std::max_element(dataSets.begin(),dataSets.end(),
-    [](const PlotData& a, const PlotData& b){
-        return a.getName().length() <  b.getName().length();
-    })->get().getName().length() + 3;
-    for (PlotData& dataSet : dataSets){
-        Legend += dataSet.getName() + std::string(MaxWordLength - dataSet.getName().length(),'.') + dataSet.getStyledSymbol() + "\033[39m\n";
+    auto x = *(std::max_element(dataSets.begin(),dataSets.end(),
+    [](const PlotData* a, const PlotData* b){
+        return a->getName().length() <  b->getName().length();
+    }));
+    auto Max = x->getName().length();
+    for (PlotData* dataSet : dataSets){
+        Legend += dataSet->getName() + std::string(Max - dataSet->getName().length(),'.') + dataSet->getStyledSymbol() + "\033[39m\n";
     }
     return Legend;
 }

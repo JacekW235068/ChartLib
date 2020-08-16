@@ -12,21 +12,19 @@ PlotData::PlotData (char Symbol,std::string Name, Style Style, Color Color)
 }
 
 PlotData::~PlotData(){
-    for(Plot& plot : plots){
-        auto it = plot.ChartMap.begin();
-	    while (it != plot.ChartMap.end())
+    for(Plot* plot : plots){
+        auto it = plot->ChartMap.begin();
+	    while (it != plot->ChartMap.end())
 	    {
             if (*(it->second) == getStyledSymbol())
             {
-                it = plot.ChartMap.erase(it);
+                it = plot->ChartMap.erase(it);
             }
             else {
                 ++it;
             }
 	    }
-        plot.dataSets.remove_if([this](PlotData& data){
-        return (&data == this);
-    });
+        plot->dataSets.remove(this);
     }
 }
 

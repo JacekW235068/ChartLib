@@ -30,7 +30,7 @@ private:
     //DATA
     double cellAspectRatio;
     std::pair<unsigned, unsigned> windowSize;
-    std::list<std::reference_wrapper<PlotData>> dataSets;
+    std::list<PlotData*> dataSets;
     //range of chart
     double visible_min_y;
     double visible_min_x;
