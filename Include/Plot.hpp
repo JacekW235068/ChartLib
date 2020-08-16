@@ -29,8 +29,8 @@ private:
 
     //DATA
     double cellAspectRatio;
-    std::pair<unsigned, unsigned> windowSize;
-    std::list<std::reference_wrapper<PlotData>> dataSets;
+    std::pair<uint16_t, uint16_t> windowSize;
+    std::list<PlotData*> dataSets;
     //range of chart
     double visible_min_y;
     double visible_min_x;
@@ -38,7 +38,7 @@ private:
     double visible_max_x;
     std::list<std::string> frame; //To bo removed
     //map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<int,int>, const std::string*> ChartMap;
+    std::map<std::pair<uint16_t,uint16_t>, std::string> ChartMap;
 
     //METHODS
     //scaling methods, sets visible range
@@ -49,13 +49,13 @@ private:
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& plotData);
     //Draw line between p1 and p2
-    void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol);
+    void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
     
 public:
 
     //CONSTRUCTORS and stuff
     Plot(
-        std::pair<unsigned, unsigned> WindowSize,
+        std::pair<uint16_t, uint16_t> WindowSize,
         double CellAspectRatio = 0.5
         );
     ~Plot();
@@ -66,7 +66,7 @@ public:
 
     //GET-SET
     //Imma let you guess what it does
-    const std::pair<unsigned, unsigned>& getWindowSize() const;
+    const std::pair<uint16_t, uint16_t>& getWindowSize() const;
     //Imma let you guess what it does
     const double& getCellAspectRatio() const;
     /**
@@ -137,8 +137,13 @@ public:
      */
     void removeDataSet(PlotData& removed);
 
+    /**
+     * Print created chart in string format
+     * 
+     * @return Chart in strgin format
+     */
+    std::string print();
     //FRIENDS AND STUFF
-    friend std::ostream& operator<<(std::ostream& s, const Plot& t);
     friend PlotData::~PlotData();//please someone delete this line after I die, I don't want anyone seeing it.
 };
 }
