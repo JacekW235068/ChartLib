@@ -225,7 +225,7 @@ void Plot::drawDots(PlotData& DataSet){
 	    data.second >= visible_min_y && data.second <= visible_max_y ){
             int y = static_cast<uint16_t>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
             int x =static_cast<uint16_t>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-            ChartMap[{y, x}] = &DataSet.getStyledSymbol();
+            ChartMap[{y, x}] = DataSet.getStyledSymbol();
   	    }
     }
 }
@@ -260,7 +260,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long YlowerCoords = std::max(0L, std::min(p1.second, p2.second));
             long YupperCoords = std::min(static_cast<long>(windowSize.second-1), std::max(p1.second, p2.second));
             while (YlowerCoords <= YupperCoords){
-       		    ChartMap[{YlowerCoords, p1.first}] = &symbol;
+       		    ChartMap[{YlowerCoords, p1.first}] = symbol;
                 YlowerCoords ++;
             } 
         }
@@ -271,7 +271,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long XlowerCoords = std::max(0L, std::min(p1.first, p2.first));
             long XupperCoords = std::min(static_cast<long>(windowSize.first-1), std::max(p1.first, p2.first));
             while (XlowerCoords <= XupperCoords){
-       		    ChartMap[{p1.second, XlowerCoords}] = &symbol; 
+       		    ChartMap[{p1.second, XlowerCoords}] = symbol; 
                 XlowerCoords ++;
             }
         } 
@@ -300,7 +300,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             //y calculated as function of x
             double y = a*XlowerCoord + b;
             while(XlowerCoord <= XupperCoord){
-       		        ChartMap[{static_cast<long>(round(y)), XlowerCoord++}] = &symbol; 
+       		        ChartMap[{static_cast<long>(round(y)), XlowerCoord++}] = symbol; 
                 y+=a;
             }
         }else{
@@ -321,7 +321,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long YupperCoord = std::min( std::min(static_cast<long>(windowSize.second -1), static_cast<long>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
-       		        ChartMap[{(YlowerCoord++),static_cast<long>(round(x))}] = &symbol; 
+       		        ChartMap[{(YlowerCoord++),static_cast<long>(round(x))}] = symbol; 
                 x+=a;
             }
         }
@@ -340,7 +340,7 @@ void Plot::removeDataSet(PlotData& removed){
     auto it = ChartMap.begin();
 	while (it != ChartMap.end())
 	{
-		if (it->second == &removed.getStyledSymbol())
+		if (it->second == removed.getStyledSymbol())
 		{
 			it = ChartMap.erase(it);
 		}
@@ -470,31 +470,31 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
 
 
 //operators
-std::ostream& operator<<(std::ostream& s, const Plot& t){ 
-    auto map_it = t.ChartMap.begin();
-    auto frame_it = t.frame.begin();
-    s <<*frame_it++;
-    for(int line=0;line < t.windowSize.second;line++){
-        int x = -1;
-        s <<*frame_it++;
-        while( map_it != t.ChartMap.end() && (*map_it).first.first == line){
-            //fill spaces
-            s << std::string((*map_it).first.second-x-1, ' ');
-            //place symbol
-            s << *(*map_it).second;
-            x = (*map_it).first.second;
-            map_it++;
-        }
-        s << "\033[39m";
-        s << std::string(t.windowSize.first -x-1,' ');
-        s <<*frame_it++;
-        s<< '\n';
-    }
-    s <<*frame_it++;
-    s << "\033[39m";
-    s<<'\n';
-    return s;
-}
+// std::ostream& operator<<(std::ostream& s, const Plot& t){ 
+//     auto map_it = t.ChartMap.begin();
+//     auto frame_it = t.frame.begin();
+//     s <<*frame_it++;
+//     for(int line=0;line < t.windowSize.second;line++){
+//         int x = -1;
+//         s <<*frame_it++;
+//         while( map_it != t.ChartMap.end() && (*map_it).first.first == line){
+//             //fill spaces
+//             s << std::string((*map_it).first.second-x-1, ' ');
+//             //place symbol
+//             s << *(*map_it).second;
+//             x = (*map_it).first.second;
+//             map_it++;
+//         }
+//         s << "\033[39m";
+//         s << std::string(t.windowSize.first -x-1,' ');
+//         s <<*frame_it++;
+//         s<< '\n';
+//     }
+//     s <<*frame_it++;
+//     s << "\033[39m";
+//     s<<'\n';
+//     return s;
+// }
 
 std::string Plot::getLegend(){
     std::string Legend;
