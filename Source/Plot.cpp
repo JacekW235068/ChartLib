@@ -468,33 +468,23 @@ void Plot::axisFrame(int Xprecission, int Yprecission){
     frame.push_back(xAxisMarks+xAxis);
 }
 
-
-//operators
-// std::ostream& operator<<(std::ostream& s, const Plot& t){ 
-//     auto map_it = t.ChartMap.begin();
-//     auto frame_it = t.frame.begin();
-//     s <<*frame_it++;
-//     for(int line=0;line < t.windowSize.second;line++){
-//         int x = -1;
-//         s <<*frame_it++;
-//         while( map_it != t.ChartMap.end() && (*map_it).first.first == line){
-//             //fill spaces
-//             s << std::string((*map_it).first.second-x-1, ' ');
-//             //place symbol
-//             s << *(*map_it).second;
-//             x = (*map_it).first.second;
-//             map_it++;
-//         }
-//         s << "\033[39m";
-//         s << std::string(t.windowSize.first -x-1,' ');
-//         s <<*frame_it++;
-//         s<< '\n';
-//     }
-//     s <<*frame_it++;
-//     s << "\033[39m";
-//     s<<'\n';
-//     return s;
-// }
+std::string Plot::print(){
+    std::string result;
+    result.reserve(windowSize.first*windowSize.second+21);
+    auto map_it = ChartMap.begin();
+    for(int line=0;line < windowSize.second;line++){
+        int x = -1;
+        while( map_it != ChartMap.end() && (*map_it).first.first == line){
+            //fill spaces + place symbol + default color
+            result += std::string((*map_it).first.second-x-1, ' ') + (*map_it).second + "\033[39m";
+            x = (*map_it).first.second;
+            map_it++;
+        }
+        result += std::string(windowSize.first -x-1,' ');
+        result += '\n';
+    }
+    return result;
+}
 
 std::string Plot::getLegend(){
     std::string Legend;

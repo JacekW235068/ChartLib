@@ -137,8 +137,13 @@ public:
      */
     void removeDataSet(PlotData& removed);
 
+    /**
+     * Print created chart in string format
+     * 
+     * @return Chart in strgin format
+     */
+    std::string print();
     //FRIENDS AND STUFF
-    friend std::ostream& operator<<(std::ostream& s, const Plot& t);
     friend PlotData::~PlotData();//please someone delete this line after I die, I don't want anyone seeing it.
 };
 }
