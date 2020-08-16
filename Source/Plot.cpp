@@ -237,28 +237,28 @@ void Plot::drawLines(PlotData& plotData){
     double visibleRangeY = visible_max_y - visible_min_y;
     auto& dataSet = plotData.getData();
     //coords for first point
-    std::pair<int,int> previousCoords(
-        static_cast<int>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
-        static_cast<int>(round((visible_max_y - dataSet.begin()->second)/visibleRangeY*(windowSize.second-1)))
+    std::pair<long,long> previousCoords(
+        static_cast<long>(round((dataSet.begin()->first-visible_min_x)/visibleRangeX*(windowSize.first-1))),
+        static_cast<long>(round((visible_max_y - dataSet.begin()->second)/visibleRangeY*(windowSize.second-1)))
     );  
     for(const std::pair<double,double>& data : dataSet){
-        int y = static_cast<int>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
-        int x =static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
+        long y = static_cast<long>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
+        long x =static_cast<long>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         drawLine(previousCoords, {x,y}, plotData.getStyledSymbol());
-        //new point becomes old
+        //new polong becomes old
         previousCoords = {x,y};
     }
 }
 
 
-void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol){
+void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std::string &symbol){
     //straight line X
     if (p1.first == p2.first){
         //is line in visible field?
         if (p1.first >= 0 && p1.first < windowSize.first){
             //draw line from low limit to high limit (limits include max window height)
-            int YlowerCoords = std::max(0, std::min(p1.second, p2.second));
-            int YupperCoords = std::min(static_cast<int>(windowSize.second-1), std::max(p1.second, p2.second));
+            long YlowerCoords = std::max(0L, std::min(p1.second, p2.second));
+            long YupperCoords = std::min(static_cast<long>(windowSize.second-1), std::max(p1.second, p2.second));
             while (YlowerCoords <= YupperCoords){
        		    ChartMap[{YlowerCoords, p1.first}] = &symbol;
                 YlowerCoords ++;
@@ -268,8 +268,8 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
     //Same but on y
     else if (p1.second == p2.second){
         if (p1.second >= 0 && p1.second < windowSize.second){
-            int XlowerCoords = std::max(0, std::min(p1.first, p2.first));
-            int XupperCoords = std::min(static_cast<int>(windowSize.first-1), std::max(p1.first, p2.first));
+            long XlowerCoords = std::max(0L, std::min(p1.first, p2.first));
+            long XupperCoords = std::min(static_cast<long>(windowSize.first-1), std::max(p1.first, p2.first));
             while (XlowerCoords <= XupperCoords){
        		    ChartMap[{p1.second, XlowerCoords}] = &symbol; 
                 XlowerCoords ++;
@@ -279,7 +279,7 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
     else{
         unsigned x_length = abs(p1.first - p2.first);
         unsigned y_length = abs(p1.second - p2.second);
-        //pick one with higher 'resolution' so it fills everything between two points
+        //pick one with higher 'resolution' so it fills everything between two polongs
         if(x_length > y_length){
             //y=ax+b
             double a = static_cast<double>(p2.second - p1.second) / (p2.first - p1.first);
@@ -294,13 +294,13 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
                 XlowerLimit = (windowSize.second -1 - b)/a;
                 XupperLimit = -b/a;
             }
-            //compare calculated limits with visible window limits and point start,end coords
-            int XlowerCoord = std::max(std::max( 0, static_cast<int>(round(XlowerLimit))), std::min(p1.first, p2.first));
-            int XupperCoord = std::min( std::min(static_cast<int>(windowSize.first -1), static_cast<int>(round(XupperLimit))), std::max(p1.first, p2.first));
+            //compare calculated limits with visible window limits and polong start,end coords
+            long XlowerCoord = std::max(std::max( 0L, static_cast<long>(round(XlowerLimit))), std::min(p1.first, p2.first));
+            long XupperCoord = std::min( std::min(static_cast<long>(windowSize.first -1), static_cast<long>(round(XupperLimit))), std::max(p1.first, p2.first));
             //y calculated as function of x
             double y = a*XlowerCoord + b;
             while(XlowerCoord <= XupperCoord){
-       		        ChartMap[{static_cast<int>(round(y)), XlowerCoord++}] = &symbol; 
+       		        ChartMap[{static_cast<long>(round(y)), XlowerCoord++}] = &symbol; 
                 y+=a;
             }
         }else{
@@ -317,11 +317,11 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
                 YlowerLimit = (windowSize.first -1 - b)/a;
                 YupperLimit = -b/a;
             }
-            int YlowerCoord = std::max(std::max( 0, static_cast<int>(round(YlowerLimit))), std::min(p1.second, p2.second));
-            int YupperCoord = std::min( std::min(static_cast<int>(windowSize.second -1), static_cast<int>(round(YupperLimit))), std::max(p1.second, p2.second));
+            long YlowerCoord = std::max(std::max( 0L, static_cast<long>(round(YlowerLimit))), std::min(p1.second, p2.second));
+            long YupperCoord = std::min( std::min(static_cast<long>(windowSize.second -1), static_cast<long>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
-       		        ChartMap[{(YlowerCoord++),static_cast<int>(round(x))}] = &symbol; 
+       		        ChartMap[{(YlowerCoord++),static_cast<long>(round(x))}] = &symbol; 
                 x+=a;
             }
         }
@@ -329,7 +329,7 @@ void Plot::drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::str
 }
 
 //DATA ACCESS AND MODIFICATION
-const std::pair<unsigned, unsigned>& Plot::getWindowSize() const{
+const std::pair<uint16_t, uint16_t>& Plot::getWindowSize() const{
     return windowSize;
 }
 const double& Plot::getCellAspectRatio() const{

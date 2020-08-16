@@ -49,7 +49,7 @@ private:
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& plotData);
     //Draw line between p1 and p2
-    void drawLine(std::pair<int, int> p1, std::pair<int,int> p2,const std::string &symbol);
+    void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
     
 public:
 
@@ -66,7 +66,7 @@ public:
 
     //GET-SET
     //Imma let you guess what it does
-    const std::pair<unsigned, unsigned>& getWindowSize() const;
+    const std::pair<uint16_t, uint16_t>& getWindowSize() const;
     //Imma let you guess what it does
     const double& getCellAspectRatio() const;
     /**
