@@ -38,7 +38,7 @@ private:
     double visible_max_x;
     std::list<std::string> frame; //To bo removed
     //map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<uint16_t,uint16_t>, std::string> ChartMap;
+    std::map<std::pair<uint16_t,uint16_t>, const std::string*> ChartMap;
 
     //METHODS
     //scaling methods, sets visible range

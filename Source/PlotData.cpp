@@ -16,7 +16,7 @@ PlotData::~PlotData(){
         auto it = plot->ChartMap.begin();
 	    while (it != plot->ChartMap.end())
 	    {
-            if ((it->second) == getStyledSymbol())
+            if ((it->second) == &getStyledSymbol())
             {
                 it = plot->ChartMap.erase(it);
             }
