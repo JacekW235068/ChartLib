@@ -44,20 +44,12 @@ const std::list<std::pair<double,double>>& PlotDataSet::getData() const{
     return dataSet;
 }
 
-void PlotDataSet::setData(std::list<std::pair<double, double>> DataSet){
+void PlotDataSet::setData(std::list<std::pair<double, double>>& DataSet){
     dataSet = DataSet;
     min_y = nan("");
     min_x = nan("");
     max_y = nan("");
     max_x = nan("");
+    dataSetModified();
 }
-
-void PlotDataSet::modifyDataSet(std::function<void(std::list<std::pair<double, double>>&)> lambda){
-    lambda(dataSet);
-    min_y = nan("");
-    min_x = nan("");
-    max_y = nan("");
-    max_x = nan("");
-}
-
 }

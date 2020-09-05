@@ -26,31 +26,24 @@ void Plot::addDataSet(PlotData& plotData){
         return;
     dataSets.push_back(&plotData);
     plotData.plots.push_back(this);
-    switch (plotData.style)
-    {
-        case Style::Linear:
-            drawLines(plotData);
-            break;
-        default:
-            drawDots(plotData);
-            break;
-    }
+    drawOnChartMap(plotData);
 }
+
+void Plot::addDataSet(PlotData* plotData){
+    if (std::find(dataSets.begin(),dataSets.end(),plotData) != dataSets.end())
+        return;
+    dataSets.push_back(plotData);
+    plotData->plots.push_back(this);
+    drawOnChartMap(*plotData);
+}
+
 void Plot::addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData){
     for (PlotData& dataSet : plotData){
         if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
             continue;
         dataSets.push_back(&dataSet);
         dataSet.plots.push_back(this);
-        switch (dataSet.style)
-        {
-            case Style::Linear:
-                drawLines(dataSet);
-                break;
-            default:
-                drawDots(dataSet);
-                break;
-        }
+        drawOnChartMap(dataSet);
     }
 }
 void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
@@ -59,15 +52,7 @@ void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
             continue;
         dataSets.push_back(&dataSet);
         dataSet.plots.push_back(this);
-        switch (dataSet.style)
-        {
-            case Style::Linear:
-                drawLines(dataSet);
-                break;
-            default:
-                drawDots(dataSet);
-                break;
-        }
+        drawOnChartMap(dataSet);
     }
 }
 void Plot::addDataSet(std::vector<PlotData*>& plotData){
@@ -76,15 +61,7 @@ void Plot::addDataSet(std::vector<PlotData*>& plotData){
             continue;
         dataSets.push_back(dataSet);
         dataSet->plots.push_back(this);
-        switch (dataSet->style)
-        {
-            case Style::Linear:
-                drawLines(*dataSet);
-                break;
-            default:
-                drawDots(*dataSet);
-                break;
-        }
+        drawOnChartMap(*dataSet);
     }
 }
 void Plot::addDataSet(std::list<PlotData*>& plotData){
@@ -93,15 +70,7 @@ void Plot::addDataSet(std::list<PlotData*>& plotData){
             continue;
         dataSets.push_back(dataSet);
         dataSet->plots.push_back(this);
-        switch (dataSet->style)
-        {
-            case Style::Linear:
-                drawLines(*dataSet);
-                break;
-            default:
-                drawDots(*dataSet);
-                break;
-        }
+        drawOnChartMap(*dataSet);
     }
 }
 
@@ -111,16 +80,8 @@ void Plot::setVisibleRange(std::pair<double,double> Xrange, std::pair<double,dou
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
 
-    for (PlotData* dataSet : dataSets){
-        switch (dataSet->style)
-        {
-            case Style::Linear:
-                drawLines(*dataSet);
-                break;
-            default:
-                drawDots(*dataSet);
-                break;
-        }
+    for (PlotData* plotData : dataSets){
+        drawOnChartMap(*plotData);
     }
 }
 
@@ -138,16 +99,8 @@ void Plot::setVisibleRange(Scale scaling, double center){
         break;
     }
 
-    for (PlotData* dataSet : dataSets){
-        switch (dataSet->style)
-        {
-            case Style::Linear:
-                drawLines(*dataSet);
-                break;
-            default:
-                drawDots(*dataSet);
-                break;
-        }
+    for (PlotData* plotData : dataSets){
+        drawOnChartMap(*plotData);
     }
 }
 
@@ -337,17 +290,7 @@ const double& Plot::getCellAspectRatio() const{
 }
 
 void Plot::removeDataSet(PlotData& removed){
-    auto it = ChartMap.begin();
-	while (it != ChartMap.end())
-	{
-		if (it->second == &removed.getStyledSymbol())
-		{
-			it = ChartMap.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
+    removeFromChartMap(removed);
     dataSets.remove(&removed);
     removed.plots.remove(this);
 }
@@ -373,99 +316,6 @@ std::tuple<double,double,double,double> Plot::getRange(){
             max_y = std::get<3>(range);
     }
     return std::make_tuple(min_x,max_x,min_y,max_y);
-}
-
-
-
-void Plot::noFrame(){
-    frame.clear();
-    //top
-    frame.push_front("");
-    for(int i=0; i < windowSize.second; i++){
-        frame.push_back("");//prefix
-        frame.push_back("");//suffix
-    }
-    //bottom
-    frame.push_back("");
-}
-
-void Plot::simpleFrame(){
-    frame.clear();
-    std::string top= u8"╔";
-    std::string bottom = u8"╚";
-    for (int i=0; i < windowSize.first; i++){
-        bottom += u8"═";
-        top += u8"═";
-    }
-    top+= u8"╗\n";
-    bottom += u8"╝";
-    //top
-    frame.push_back(top);
-    for(int i=0; i < windowSize.second; i++){
-        frame.push_back(u8"║");//prefix
-        frame.push_back(u8"║");//suffix
-    }
-    //bottom
-    frame.push_back(bottom);
-}
-void Plot::axisFrame(int Xprecission, int Yprecission){
-    frame.clear();
-    //XAXIS (top&bottom)
-    double visibleRangeX = visible_max_x - visible_min_x;
-    double xUnit = pow(10.0,Xprecission);
-    double x = ceil(visible_min_x/xUnit)*xUnit;
-    std::string xAxisMarks = std::string(windowSize.first+1,' ');
-    std::string xAxis = "";
-    int preAxisCoord = -1;
-    std::string number;
-    while (x <= visible_max_x){
-        x = round(x*pow(10.0,-Xprecission))/pow(10.0,-Xprecission);
-        int axisCoord = static_cast<int>(round((x-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-        if(axisCoord -preAxisCoord -1<0){
-            x+= pow(10.0,Xprecission);
-            continue;
-        }
-        xAxisMarks[axisCoord+1] = '.';
-        xAxis += std::string(axisCoord -preAxisCoord -1, ' ');  
-        number = std::to_string(x);  
-        if(Xprecission >=0){   
-            number = number.substr(0,number.find('.'));
-        }else
-            number = number.substr(0,number.find('.')-Xprecission+1);
-        xAxis += number+' ';
-        preAxisCoord = xAxis.length()-1;
-        x+= pow(10.0,Xprecission);
-    }
-    xAxisMarks += '\n';
-    frame.push_back(xAxisMarks);
-    //YAXIS
-    double visibleRangeY = visible_max_y - visible_min_y;
-    double yUnit = pow(10.0,Yprecission);
-    double y = floor(visible_max_y/yUnit)*yUnit;
-    y = round(y*pow(10.0,-Yprecission))/pow(10.0,-Yprecission);
-    int axisCoord = static_cast<int>(round((visible_max_y - y)/visibleRangeY*(windowSize.second-1)));
-    int lineCounter = 0;
-    for(int i=0; i < windowSize.second; i++){
-        if(axisCoord == lineCounter){
-            number = std::to_string(y);  
-            if(Yprecission >=0){   
-                number = number.substr(0,number.find('.'));
-            }else
-                number = number.substr(0,number.find('.')-Yprecission+1);
-            frame.push_back("-");
-            frame.push_back("-"+number);
-            while (axisCoord==lineCounter){
-                y-= pow(10.0,Yprecission);
-                y = round(y*pow(10.0,-Yprecission))/pow(10.0,-Yprecission);
-                axisCoord = static_cast<int>(round((visible_max_y - y)/visibleRangeY*(windowSize.second-1)));
-            }
-        }else{
-            frame.push_back(" ");
-            frame.push_back("");
-        }
-        lineCounter++;
-    }
-    frame.push_back(xAxisMarks+xAxis);
 }
 
 std::string Plot::print(){
@@ -499,4 +349,33 @@ std::string Plot::getLegend(){
     }
     return Legend;
 }
+
+
+void Plot::drawOnChartMap(PlotData& plotData){
+    switch (plotData.style)
+    {
+        case Style::Linear:
+            drawLines(plotData);
+            break;
+        case Style::dots:
+            drawDots(plotData);
+            break;
+        default: break;
+    }
+}
+
+void Plot::removeFromChartMap(PlotData& plotData){
+    auto it = ChartMap.begin();
+	while (it != ChartMap.end())
+	{
+		if (it->second == &plotData.getStyledSymbol())
+		{
+			it = ChartMap.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+}
+
 }

@@ -50,7 +50,9 @@ private:
     void drawLines(PlotData& plotData);
     //Draw line between p1 and p2
     void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
-    
+    //PlotDataConnection methods
+    void drawOnChartMap(PlotData& plotData);
+    void removeFromChartMap(PlotData& plotData);
 public:
 
     //CONSTRUCTORS and stuff
@@ -102,6 +104,7 @@ public:
      * @param plotData reference to single dataset.
      */
     void addDataSet(PlotData& plotData);
+    void addDataSet(PlotData* plotData);
     /**
      * @overload
      * Adds datasets to chart and prints them right away if visible range is set.
@@ -144,6 +147,7 @@ public:
      */
     std::string print();
     //FRIENDS AND STUFF
+    friend void PlotData::dataSetModified();
     friend PlotData::~PlotData();//please someone delete this line after I die, I don't want anyone seeing it.
 };
 }

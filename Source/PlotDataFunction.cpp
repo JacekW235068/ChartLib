@@ -46,10 +46,13 @@ void PlotDataFunction::setRange(std::pair<double,double> XRange){
           else if(y > max_y){
                max_y = y;
           }
-     } 
+     }
+     dataSetModified();
 }
+
 void PlotDataFunction::setFunction(double (*Fun)(double)){
      dataSet.clear();
+     fun = Fun;
      double x = min_x;
      double y = fun(x);
      min_y = y;
@@ -63,7 +66,8 @@ void PlotDataFunction::setFunction(double (*Fun)(double)){
           else if(y > max_y){
                max_y = y;
           }
-     } 
+     }
+     dataSetModified();
 }
 std::tuple<double,double,double,double> PlotDataFunction::getRange() const{
      return std::make_tuple(min_x,max_x,min_y,max_y);
@@ -87,7 +91,8 @@ void PlotDataFunction::setAccuracy(double Accuracy){
           else if(y > max_y){
                max_y = y;
           }
-     } 
+     }
+     void dataSetModified();
 }
 double PlotDataFunction::getAccuracy(){
      return accuracy;
