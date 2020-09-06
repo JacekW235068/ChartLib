@@ -20,56 +20,51 @@ namespace chart {
 /**
  * Main class implementing terminal chart.
  *
- * Contains datasets and is capable of printing them in given visibile range
+ * Contains datasets references and is capable of printing them in given visibile range
  *
  */
 class Plot
 {
 private:
 
-    //DATA
+    // DATA
     double cellAspectRatio;
     std::pair<uint16_t, uint16_t> windowSize;
     std::list<PlotData*> dataSets;
-    //range of chart
+    // range of chart
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
     double visible_max_x;
-    std::list<std::string> frame; //To bo removed
-    //map with coords !(Y,X)! and symbols to draw onto chart 
+    // map with coords !(Y,X)! and symbols to draw onto chart 
     std::map<std::pair<uint16_t,uint16_t>, const std::string*> ChartMap;
 
-    //METHODS
-    //scaling methods, sets visible range
+    // METHODS
+    // scaling methods, sets visible range
     void visibleRange_scalex(double center);
     void visibleRange_scaley(double center);
     void visibleRange_stretch();
-    //"draws" symbols and saves them in map
+    // "draws" symbols and saves them in map
     void drawDots(PlotData& DataSet);
     void drawLines(PlotData& plotData);
-    //Draw line between p1 and p2
+    // Draw line between p1 and p2
     void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
-    //PlotDataConnection methods
+    // PlotDataConnection methods
     void drawOnChartMap(PlotData& plotData);
     void removeFromChartMap(PlotData& plotData);
 public:
 
-    //CONSTRUCTORS and stuff
+    // CONSTRUCTORS
     Plot(
         std::pair<uint16_t, uint16_t> WindowSize,
         double CellAspectRatio = 0.5
         );
     ~Plot();
 
-    //METHODS
-
-
-
-    //GET-SET
-    //Imma let you guess what it does
+    // METHODS
+    // Imma let you guess what it does
     const std::pair<uint16_t, uint16_t>& getWindowSize() const;
-    //Imma let you guess what it does
+    // Imma let you guess what it does
     const double& getCellAspectRatio() const;
     /**
      * @return Legend generated based on names and symbols of included datasets
@@ -93,10 +88,6 @@ public:
      * @param Yrange Min-Max pair of Y values
      */
     void setVisibleRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange);
-
-    void noFrame(); //To bo removed
-    void simpleFrame(); //To bo removed
-    void axisFrame(int Xprecission = 0, int Yprecission = 0); //To bo removed
 
     /**
      * Adds dataset to chart and prints it right away if visible range is set.
@@ -146,8 +137,10 @@ public:
      * @return Chart in strgin format
      */
     std::string print();
-    //FRIENDS AND STUFF
+    // FRIENDS & STUFF
+    // calls remove and draw
     friend void PlotData::dataSetModified();
-    friend PlotData::~PlotData();//please someone delete this line after I die, I don't want anyone seeing it.
+    // calls remove
+    friend PlotData::~PlotData();// please someone delete this line after I die, I don't want anyone seeing it.
 };
 }

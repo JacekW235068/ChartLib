@@ -15,12 +15,14 @@ Plot::Plot(std::pair<uint16_t, uint16_t> WindowSize,
     visible_max_y(nan(""))
 {
 }
+
 Plot::~Plot()
 {
     for (PlotData* data : dataSets){
         data->plots.remove(this);
     }
 }
+
 void Plot::addDataSet(PlotData& plotData){
     if (std::find(dataSets.begin(),dataSets.end(),&plotData) != dataSets.end())
         return;
@@ -55,6 +57,7 @@ void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
         drawOnChartMap(dataSet);
     }
 }
+
 void Plot::addDataSet(std::vector<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
         if (std::find(dataSets.begin(),dataSets.end(),dataSet) != dataSets.end())
@@ -64,6 +67,7 @@ void Plot::addDataSet(std::vector<PlotData*>& plotData){
         drawOnChartMap(*dataSet);
     }
 }
+
 void Plot::addDataSet(std::list<PlotData*>& plotData){
     for (PlotData* dataSet : plotData){
         if (std::find(dataSets.begin(),dataSets.end(),dataSet) != dataSets.end())
@@ -175,11 +179,11 @@ void Plot::drawDots(PlotData& DataSet){
 
     for(const auto& data : DataSet.getData()){
         if(data.first >= visible_min_x && data.first <= visible_max_x &&
-	    data.second >= visible_min_y && data.second <= visible_max_y ){
+        data.second >= visible_min_y && data.second <= visible_max_y ){
             int y = static_cast<uint16_t>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
             int x =static_cast<uint16_t>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
             ChartMap[{y, x}] = &DataSet.getStyledSymbol();
-  	    }
+        }
     }
 }
 
@@ -203,7 +207,6 @@ void Plot::drawLines(PlotData& plotData){
     }
 }
 
-
 void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std::string &symbol){
     //straight line X
     if (p1.first == p2.first){
@@ -213,9 +216,9 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long YlowerCoords = std::max(0L, std::min(p1.second, p2.second));
             long YupperCoords = std::min(static_cast<long>(windowSize.second-1), std::max(p1.second, p2.second));
             while (YlowerCoords <= YupperCoords){
-       		    ChartMap[{YlowerCoords, p1.first}] = &symbol;
+                ChartMap[{YlowerCoords, p1.first}] = &symbol;
                 YlowerCoords ++;
-            } 
+            }
         }
     }
     //Same but on y
@@ -285,6 +288,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
 const std::pair<uint16_t, uint16_t>& Plot::getWindowSize() const{
     return windowSize;
 }
+
 const double& Plot::getCellAspectRatio() const{
     return cellAspectRatio;
 }
@@ -350,7 +354,6 @@ std::string Plot::getLegend(){
     return Legend;
 }
 
-
 void Plot::drawOnChartMap(PlotData& plotData){
     switch (plotData.style)
     {
@@ -366,16 +369,15 @@ void Plot::drawOnChartMap(PlotData& plotData){
 
 void Plot::removeFromChartMap(PlotData& plotData){
     auto it = ChartMap.begin();
-	while (it != ChartMap.end())
-	{
-		if (it->second == &plotData.getStyledSymbol())
-		{
-			it = ChartMap.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
+    while (it != ChartMap.end())
+    {
+        if (it->second == &plotData.getStyledSymbol())
+        {
+            it = ChartMap.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
 }
-
 }

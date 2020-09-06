@@ -44,6 +44,9 @@ public:
     const Color& getColor() const;
     void setColor(Color Color);
     const std::string& getStyledSymbol() const;
+    
+    // FRIENDS & STUFF
+    // manipulates plots list
     friend class Plot;
 };
  
