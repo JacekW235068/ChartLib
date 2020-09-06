@@ -11,7 +11,8 @@ class PlotDataFunction : public PlotData
 protected:
     std::list<std::pair<double, double>> dataSet;
     double accuracy;
-    double (*fun)(double) ;
+    double (*fun)(double);
+    void regenerateDataSet();
 public:
     PlotDataFunction(double (*Fun)(double),
      std::pair<double,double> XRange,double Accuracy,

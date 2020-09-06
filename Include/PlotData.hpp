@@ -7,12 +7,14 @@
 #include <tuple>
 #include <cmath>
 #include <string>
+
 namespace chart{
 
 class Plot;
 
 class PlotData
 {
+
 protected:
     //cached range
     mutable double min_x;
@@ -26,6 +28,7 @@ protected:
     static std::string mapColor(Color color);
     void setStyledSymbol();
     std::list<Plot*> plots;
+    void dataSetModified();
 public:
     char symbol;
     //line,dots, that kinda stuff
@@ -41,6 +44,9 @@ public:
     const Color& getColor() const;
     void setColor(Color Color);
     const std::string& getStyledSymbol() const;
+    
+    // FRIENDS & STUFF
+    // manipulates plots list
     friend class Plot;
 };
  

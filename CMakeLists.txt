@@ -6,7 +6,6 @@ set (SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Plot.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotData.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataFunction.cpp;
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataOrderedSet.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataSet.cpp;
 )
 add_library(ChartLib ${SOURCES})
