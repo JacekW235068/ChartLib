@@ -7,6 +7,7 @@ set (SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotData.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataFunction.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataSet.cpp;
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/SimpleDoubleLineFrame.cpp;
 )
 add_library(ChartLib ${SOURCES})
 target_include_directories(ChartLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

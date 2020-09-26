@@ -28,7 +28,6 @@ protected:
     static std::string mapColor(Color color);
     void setStyledSymbol();
     std::list<Plot*> plots;
-    void dataSetModified();
 public:
     char symbol;
     //line,dots, that kinda stuff

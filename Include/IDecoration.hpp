@@ -22,8 +22,10 @@ public:
      * @return min max X and min max Y of ChartMap after changes made by decoration (can also be negative values if something is drawn to the left of above chart)
      */
     virtual std::tuple<int,int,int,int> drawFrame(
-        std::map<std::pair<uint16_t,uint16_t>, const std::string*>& ChartMap,
+        std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange) const = 0;
+    
+    virtual bool isForced() const = 0;
 };
 }

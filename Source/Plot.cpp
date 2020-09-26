@@ -23,39 +23,13 @@ Plot::~Plot()
     }
 }
 
-void Plot::addDataSet(PlotData& plotData){
-    if (std::find(dataSets.begin(),dataSets.end(),&plotData) != dataSets.end())
-        return;
-    dataSets.push_back(&plotData);
-    plotData.plots.push_back(this);
-    drawOnChartMap(plotData);
-}
 
 void Plot::addDataSet(PlotData* plotData){
     if (std::find(dataSets.begin(),dataSets.end(),plotData) != dataSets.end())
         return;
     dataSets.push_back(plotData);
     plotData->plots.push_back(this);
-    drawOnChartMap(*plotData);
-}
 
-void Plot::addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData){
-    for (PlotData& dataSet : plotData){
-        if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
-            continue;
-        dataSets.push_back(&dataSet);
-        dataSet.plots.push_back(this);
-        drawOnChartMap(dataSet);
-    }
-}
-void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
-    for (PlotData& dataSet : plotData){
-        if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
-            continue;
-        dataSets.push_back(&dataSet);
-        dataSet.plots.push_back(this);
-        drawOnChartMap(dataSet);
-    }
 }
 
 void Plot::addDataSet(std::vector<PlotData*>& plotData){
@@ -64,7 +38,7 @@ void Plot::addDataSet(std::vector<PlotData*>& plotData){
             continue;
         dataSets.push_back(dataSet);
         dataSet->plots.push_back(this);
-        drawOnChartMap(*dataSet);
+
     }
 }
 
@@ -74,7 +48,6 @@ void Plot::addDataSet(std::list<PlotData*>& plotData){
             continue;
         dataSets.push_back(dataSet);
         dataSet->plots.push_back(this);
-        drawOnChartMap(*dataSet);
     }
 }
 
@@ -83,10 +56,6 @@ void Plot::setVisibleRange(std::pair<double,double> Xrange, std::pair<double,dou
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
-
-    for (PlotData* plotData : dataSets){
-        drawOnChartMap(*plotData);
-    }
 }
 
 void Plot::setVisibleRange(Scale scaling, double center){
@@ -101,10 +70,6 @@ void Plot::setVisibleRange(Scale scaling, double center){
     case Scale::stretch:
         visibleRange_stretch();
         break;
-    }
-
-    for (PlotData* plotData : dataSets){
-        drawOnChartMap(*plotData);
     }
 }
 
@@ -293,10 +258,9 @@ const double& Plot::getCellAspectRatio() const{
     return cellAspectRatio;
 }
 
-void Plot::removeDataSet(PlotData& removed){
-    removeFromChartMap(removed);
-    dataSets.remove(&removed);
-    removed.plots.remove(this);
+void Plot::removeDataSet(PlotData* removed){
+    dataSets.remove(removed);
+    removed->plots.remove(this);
 }
 
 
@@ -322,7 +286,19 @@ std::tuple<double,double,double,double> Plot::getRange(){
     return std::make_tuple(min_x,max_x,min_y,max_y);
 }
 
+void Plot::generate(){
+    ChartMap.clear();
+    for (auto dataSet : dataSets)
+        drawOnChartMap(*dataSet);
+    for (IDecoration* decoration : decorations)
+        if (decoration->isForced())
+            decoration->drawFrame(FrontMap, windowSize, {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
+        else
+            decoration->drawFrame(BehindMap, windowSize, {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
+}
+
 std::string Plot::print(){
+    generate();
     std::string result;
     result.reserve(windowSize.first*windowSize.second+21);
     auto map_it = ChartMap.begin();
@@ -367,17 +343,25 @@ void Plot::drawOnChartMap(PlotData& plotData){
     }
 }
 
-void Plot::removeFromChartMap(PlotData& plotData){
-    auto it = ChartMap.begin();
-    while (it != ChartMap.end())
-    {
-        if (it->second == &plotData.getStyledSymbol())
-        {
-            it = ChartMap.erase(it);
-        }
-        else {
-            ++it;
-        }
+
+void Plot::addDecoration(IDecoration* decoration){
+    decorations.push_back(decoration);
+}
+
+void Plot::addDecoration(std::vector<IDecoration*> decorations){
+    for(IDecoration* decoration : decorations){
+        this->decorations.push_back(decoration);
     }
 }
+
+void Plot::addDecoration(std::list<IDecoration*> decorations){
+    for(IDecoration* decoration : decorations){
+        this->decorations.push_back(decoration);
+    }
+}
+
+void Plot::removeDecoration(IDecoration* decoration){
+    decorations.remove(decoration);
+}
+
 }
