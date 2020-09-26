@@ -38,11 +38,7 @@ private:
     double visible_max_y;
     double visible_max_x;
     // map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<uint16_t,uint16_t>, const std::string*> ChartMap;
-
-    //Also chartmaps but for decorations
-    std::map<std::pair<int,int>, std::string> FrontMap;
-    std::map<std::pair<int,int>, std::string> BehindMap;
+    std::map<std::pair<int,int>, std::string> ChartMap;
 
     // METHODS
     // scaling methods, sets visible range
@@ -56,7 +52,7 @@ private:
     void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
     // PlotDataConnection methods
     void drawOnChartMap(PlotData& plotData);
-    void generate();
+    std::tuple<int,int,int,int> generate();
 public:
 
     // CONSTRUCTORS
