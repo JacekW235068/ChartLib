@@ -301,10 +301,10 @@ std::tuple<int,int,int,int> Plot::generate(){
                 min_x = x;
             if (y < min_y)
                 min_y = y;
-            if (x > max_x)
-                max_x = x;
-            if (y > max_y)
-                max_y = y;
+            if (X > max_x)
+                max_x = X;
+            if (Y > max_y)
+                max_y = Y;
         }
     for (auto dataSet : dataSets)
         drawOnChartMap(*dataSet);
@@ -317,10 +317,10 @@ std::tuple<int,int,int,int> Plot::generate(){
                 min_x = x;
             if (y < min_y)
                 min_y = y;
-            if (x > max_x)
-                max_x = x;
-            if (y > max_y)
-                max_y = y;
+            if (X > max_x)
+                max_x = X;
+            if (Y > max_y)
+                max_y = Y;
         }
     return {min_x,max_x,min_y,max_y};
 }
