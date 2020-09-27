@@ -8,6 +8,7 @@ set (SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataFunction.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/PlotDataSet.cpp;
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/SimpleDoubleLineFrame.cpp;
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/XAxisLabels.cpp;
 )
 add_library(ChartLib ${SOURCES})
 target_include_directories(ChartLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

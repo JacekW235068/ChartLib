@@ -6,7 +6,7 @@ namespace chart{
 std::tuple<int,int,int,int> SimpleDoubleLineFrame::drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
-        const std::tuple<double,double,double,double>& VisibleRange) const {
+        const std::tuple<double,double,double,double>& VisibleRange) {
     // Frame corners
     ChartMap[{-1,-1}] = u8"╔";
     ChartMap[{WindowSize.second,-1}] = u8"╚";
