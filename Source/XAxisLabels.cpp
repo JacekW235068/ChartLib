@@ -59,4 +59,11 @@ void XAxisLabels::setPrecision(int Precision){
 int XAxisLabels::getPrecision(){
     return precision;
 }
+
+void XAxisLabels::setJump(double Jump){
+    jump = Jump;
+}
+double XAxisLabels::getJump(){
+return jump;
+}
 }

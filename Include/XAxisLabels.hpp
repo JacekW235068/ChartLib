@@ -16,5 +16,7 @@ public:
     bool isForced() const override;
     void setPrecision(int Precision);
     int getPrecision();
+    void setJump(double Jump);
+    double getJump();
 };
 }
