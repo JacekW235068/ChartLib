@@ -70,4 +70,11 @@ void XAxisLabels::setJump(double Jump){
 double XAxisLabels::getJump(){
 return jump;
 }
+
+void XAxisLabels::setStar(double Start){
+    start = Start;
+}
+double XAxisLabels::getStar(){
+    return start;
+}
 }
