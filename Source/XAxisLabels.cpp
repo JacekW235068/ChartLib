@@ -6,7 +6,7 @@
 
 namespace chart{
 
-XAxisLabels::XAxisLabels(uint Precision, double Jump) : precision(Precision), jump(Jump)
+XAxisLabels::XAxisLabels(uint Precision, double Jump, double Start) : precision(Precision), jump(Jump), start(Start)
 {}
 
 std::tuple<int,int,int,int> XAxisLabels::drawFrame(
@@ -18,7 +18,13 @@ std::tuple<int,int,int,int> XAxisLabels::drawFrame(
     double visibleRangeX = get<1>(VisibleRange) - get<0>(VisibleRange);
     if(jump <= 0.0) 
         jump = pow(10.0,-precision);
-    double x = ceil(get<0>(VisibleRange)/jump)*jump;
+    double x = start;
+    while (x > get<0>(VisibleRange)){
+        x -= jump;
+    }
+    while (x < get<0>(VisibleRange)){
+        x += jump;
+    }
     int xCell = static_cast<int>(round((x-get<0>(VisibleRange))/visibleRangeX*(WindowSize.first-1)));
     int lastNumberCell = -21;
     int firstNumberCell;
@@ -41,8 +47,6 @@ std::tuple<int,int,int,int> XAxisLabels::drawFrame(
             lastNumberCell = firstNumberCell;
             ChartMap[{WindowSize.second,xCell}] = '.';
         }
-
-
         x += jump;
         xCell = static_cast<int>(round((x-get<0>(VisibleRange))/visibleRangeX*(WindowSize.first-1)));
     }

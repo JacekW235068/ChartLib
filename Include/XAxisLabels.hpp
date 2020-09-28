@@ -6,8 +6,9 @@ class XAxisLabels : public IDecoration{
 private:
     int precision;
     double jump;
+    double start;
 public:
-    XAxisLabels(uint Precision, double Jump = -1.0);
+    XAxisLabels(uint Precision, double Jump = -1.0, double Start = 0.0);
     virtual ~XAxisLabels() = default;
     std::tuple<int,int,int,int> drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
