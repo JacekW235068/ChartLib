@@ -23,39 +23,13 @@ Plot::~Plot()
     }
 }
 
-void Plot::addDataSet(PlotData& plotData){
-    if (std::find(dataSets.begin(),dataSets.end(),&plotData) != dataSets.end())
-        return;
-    dataSets.push_back(&plotData);
-    plotData.plots.push_back(this);
-    drawOnChartMap(plotData);
-}
 
 void Plot::addDataSet(PlotData* plotData){
     if (std::find(dataSets.begin(),dataSets.end(),plotData) != dataSets.end())
         return;
     dataSets.push_back(plotData);
     plotData->plots.push_back(this);
-    drawOnChartMap(*plotData);
-}
 
-void Plot::addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData){
-    for (PlotData& dataSet : plotData){
-        if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
-            continue;
-        dataSets.push_back(&dataSet);
-        dataSet.plots.push_back(this);
-        drawOnChartMap(dataSet);
-    }
-}
-void Plot::addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData){
-    for (PlotData& dataSet : plotData){
-        if (std::find(dataSets.begin(),dataSets.end(),&dataSet) != dataSets.end())
-            continue;
-        dataSets.push_back(&dataSet);
-        dataSet.plots.push_back(this);
-        drawOnChartMap(dataSet);
-    }
 }
 
 void Plot::addDataSet(std::vector<PlotData*>& plotData){
@@ -64,7 +38,7 @@ void Plot::addDataSet(std::vector<PlotData*>& plotData){
             continue;
         dataSets.push_back(dataSet);
         dataSet->plots.push_back(this);
-        drawOnChartMap(*dataSet);
+
     }
 }
 
@@ -74,7 +48,6 @@ void Plot::addDataSet(std::list<PlotData*>& plotData){
             continue;
         dataSets.push_back(dataSet);
         dataSet->plots.push_back(this);
-        drawOnChartMap(*dataSet);
     }
 }
 
@@ -83,10 +56,6 @@ void Plot::setVisibleRange(std::pair<double,double> Xrange, std::pair<double,dou
     visible_max_x = Xrange.second;
     visible_min_y = Yrange.first;
     visible_max_y = Yrange.second;
-
-    for (PlotData* plotData : dataSets){
-        drawOnChartMap(*plotData);
-    }
 }
 
 void Plot::setVisibleRange(Scale scaling, double center){
@@ -101,10 +70,6 @@ void Plot::setVisibleRange(Scale scaling, double center){
     case Scale::stretch:
         visibleRange_stretch();
         break;
-    }
-
-    for (PlotData* plotData : dataSets){
-        drawOnChartMap(*plotData);
     }
 }
 
@@ -180,9 +145,9 @@ void Plot::drawDots(PlotData& DataSet){
     for(const auto& data : DataSet.getData()){
         if(data.first >= visible_min_x && data.first <= visible_max_x &&
         data.second >= visible_min_y && data.second <= visible_max_y ){
-            int y = static_cast<uint16_t>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
-            int x =static_cast<uint16_t>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-            ChartMap[{y, x}] = &DataSet.getStyledSymbol();
+            int y = static_cast<int>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
+            int x = static_cast<int>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
+            ChartMap[{y, x}] = DataSet.getStyledSymbol();
         }
     }
 }
@@ -216,7 +181,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long YlowerCoords = std::max(0L, std::min(p1.second, p2.second));
             long YupperCoords = std::min(static_cast<long>(windowSize.second-1), std::max(p1.second, p2.second));
             while (YlowerCoords <= YupperCoords){
-                ChartMap[{YlowerCoords, p1.first}] = &symbol;
+                ChartMap[{YlowerCoords, p1.first}] = symbol;
                 YlowerCoords ++;
             }
         }
@@ -227,7 +192,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long XlowerCoords = std::max(0L, std::min(p1.first, p2.first));
             long XupperCoords = std::min(static_cast<long>(windowSize.first-1), std::max(p1.first, p2.first));
             while (XlowerCoords <= XupperCoords){
-       		    ChartMap[{p1.second, XlowerCoords}] = &symbol; 
+       		    ChartMap[{p1.second, XlowerCoords}] = symbol; 
                 XlowerCoords ++;
             }
         } 
@@ -256,7 +221,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             //y calculated as function of x
             double y = a*XlowerCoord + b;
             while(XlowerCoord <= XupperCoord){
-       		        ChartMap[{static_cast<long>(round(y)), XlowerCoord++}] = &symbol; 
+       		        ChartMap[{static_cast<long>(round(y)), XlowerCoord++}] = symbol; 
                 y+=a;
             }
         }else{
@@ -277,7 +242,7 @@ void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std:
             long YupperCoord = std::min( std::min(static_cast<long>(windowSize.second -1), static_cast<long>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
-       		        ChartMap[{(YlowerCoord++),static_cast<long>(round(x))}] = &symbol; 
+       		        ChartMap[{(YlowerCoord++),static_cast<long>(round(x))}] = symbol; 
                 x+=a;
             }
         }
@@ -293,10 +258,9 @@ const double& Plot::getCellAspectRatio() const{
     return cellAspectRatio;
 }
 
-void Plot::removeDataSet(PlotData& removed){
-    removeFromChartMap(removed);
-    dataSets.remove(&removed);
-    removed.plots.remove(this);
+void Plot::removeDataSet(PlotData* removed){
+    dataSets.remove(removed);
+    removed->plots.remove(this);
 }
 
 
@@ -322,21 +286,61 @@ std::tuple<double,double,double,double> Plot::getRange(){
     return std::make_tuple(min_x,max_x,min_y,max_y);
 }
 
+std::tuple<int,int,int,int> Plot::generate(){
+    int min_x = 0;
+    int min_y = 0;
+    int max_y = windowSize.second-1;
+    int max_x = windowSize.first-1;
+
+    for (IDecoration* decoration : decorations)
+        if(!decoration->isForced()){
+            auto [x,X,y,Y] = decoration->drawFrame(ChartMap,
+            windowSize,
+            {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
+            if (x < min_x)
+                min_x = x;
+            if (y < min_y)
+                min_y = y;
+            if (X > max_x)
+                max_x = X;
+            if (Y > max_y)
+                max_y = Y;
+        }
+    for (auto dataSet : dataSets)
+        drawOnChartMap(*dataSet);
+    for (IDecoration* decoration : decorations)
+        if(decoration->isForced()){
+            auto [x,X,y,Y] = decoration->drawFrame(ChartMap,
+            windowSize,
+            {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
+            if (x < min_x)
+                min_x = x;
+            if (y < min_y)
+                min_y = y;
+            if (X > max_x)
+                max_x = X;
+            if (Y > max_y)
+                max_y = Y;
+        }
+    return {min_x,max_x,min_y,max_y};
+}
+
 std::string Plot::print(){
+    auto [min_x,max_x,min_y,max_y] = generate();
     std::string result;
     result.reserve(windowSize.first*windowSize.second+21);
-    auto map_it = ChartMap.begin();
-    for(int line=0;line < windowSize.second;line++){
-        int x = -1;
-        while( map_it != ChartMap.end() && (*map_it).first.first == line){
+    auto plot_it = ChartMap.begin();
+    for(int line=min_y;line <= max_y; line++){
+        int x = min_x-1;
+        while( plot_it != ChartMap.end() && (*plot_it).first.first == line){
             //fill spaces + place symbol + default color
-            result += std::string((*map_it).first.second-x-1, ' ') + *(*map_it).second + "\033[39m";
-            x = (*map_it).first.second;
-            map_it++;
+            result += std::string((*plot_it).first.second-x-1, ' ') + (*plot_it).second + "\033[39m";
+            x = (*plot_it++).first.second;
         }
-        result += std::string(windowSize.first -x-1,' ');
+        result += std::string(max_x-x,' ');
         result += '\n';
     }
+    ChartMap.clear();
     return result;
 }
 
@@ -367,17 +371,25 @@ void Plot::drawOnChartMap(PlotData& plotData){
     }
 }
 
-void Plot::removeFromChartMap(PlotData& plotData){
-    auto it = ChartMap.begin();
-    while (it != ChartMap.end())
-    {
-        if (it->second == &plotData.getStyledSymbol())
-        {
-            it = ChartMap.erase(it);
-        }
-        else {
-            ++it;
-        }
+
+void Plot::addDecoration(IDecoration* decoration){
+    decorations.push_back(decoration);
+}
+
+void Plot::addDecoration(std::vector<IDecoration*> decorations){
+    for(IDecoration* decoration : decorations){
+        this->decorations.push_back(decoration);
     }
 }
+
+void Plot::addDecoration(std::list<IDecoration*> decorations){
+    for(IDecoration* decoration : decorations){
+        this->decorations.push_back(decoration);
+    }
+}
+
+void Plot::removeDecoration(IDecoration* decoration){
+    decorations.remove(decoration);
+}
+
 }

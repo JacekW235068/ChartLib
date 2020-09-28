@@ -54,7 +54,6 @@ void PlotDataFunction::regenerateDataSet(){
                max_y = y;
           }
      }
-     dataSetModified();
 }
 
 }

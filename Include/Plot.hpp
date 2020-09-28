@@ -1,13 +1,13 @@
 #pragma once
-#include <PlotData.hpp>
-#include <Scale.hpp>
-
 #include <vector>
 #include <list>
 #include <iostream>
 #include <tuple>
 #include <map>
 
+#include <PlotData.hpp>
+#include <Scale.hpp>
+#include<IDecoration.hpp>
 
 
 /**
@@ -31,13 +31,14 @@ private:
     double cellAspectRatio;
     std::pair<uint16_t, uint16_t> windowSize;
     std::list<PlotData*> dataSets;
+    std::list<IDecoration*> decorations;
     // range of chart
     double visible_min_y;
     double visible_min_x;
     double visible_max_y;
     double visible_max_x;
     // map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<uint16_t,uint16_t>, const std::string*> ChartMap;
+    std::map<std::pair<int,int>, std::string> ChartMap;
 
     // METHODS
     // scaling methods, sets visible range
@@ -51,7 +52,7 @@ private:
     void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
     // PlotDataConnection methods
     void drawOnChartMap(PlotData& plotData);
-    void removeFromChartMap(PlotData& plotData);
+    std::tuple<int,int,int,int> generate();
 public:
 
     // CONSTRUCTORS
@@ -92,24 +93,9 @@ public:
     /**
      * Adds dataset to chart and prints it right away if visible range is set.
      *
-     * @param plotData reference to single dataset.
+     * @param plotData pointer to single dataset.
      */
-    void addDataSet(PlotData& plotData);
     void addDataSet(PlotData* plotData);
-    /**
-     * @overload
-     * Adds datasets to chart and prints them right away if visible range is set.
-     *
-     * @param plotData `vector` of datasets references to include in chart
-     */
-    void addDataSet(std::vector<std::reference_wrapper<PlotData>>& plotData);
-    /**
-     * @overload
-     * Adds datasets to chart and prints them right away if visible range is set.
-     *
-     * @param plotData `list` of datasets references to include in chart
-     */
-    void addDataSet(std::list<std::reference_wrapper<PlotData>>& plotData);
     /**
      * @overload
      * Adds datasets to chart and prints them right away if visible range is set.
@@ -129,7 +115,12 @@ public:
      *
      * @param removed reference to the **exact** dataset that is to be removed.
      */
-    void removeDataSet(PlotData& removed);
+    void removeDataSet(PlotData* removed);
+
+    void addDecoration(IDecoration* decoration);
+    void addDecoration(std::vector<IDecoration*> decorations);
+    void addDecoration(std::list<IDecoration*> decorations);
+    void removeDecoration(IDecoration* decoration);
 
     /**
      * Print created chart in string format
@@ -138,9 +129,6 @@ public:
      */
     std::string print();
     // FRIENDS & STUFF
-    // calls remove and draw
-    friend void PlotData::dataSetModified();
-    // calls remove
     friend PlotData::~PlotData();// please someone delete this line after I die, I don't want anyone seeing it.
 };
 }

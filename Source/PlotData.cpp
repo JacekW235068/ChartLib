@@ -13,15 +13,7 @@ PlotData::PlotData (char Symbol,std::string Name, Style Style, Color Color)
 
 PlotData::~PlotData(){
     for(Plot* plot : plots){
-        plot->removeFromChartMap(*this);
         plot->dataSets.remove(this);
-    }
-}
-
-void PlotData::dataSetModified(){
-    for(Plot* plot : plots){
-        plot->removeFromChartMap(*this);
-        plot->drawOnChartMap(*this);
     }
 }
 

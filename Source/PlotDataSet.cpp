@@ -50,6 +50,5 @@ void PlotDataSet::setData(std::list<std::pair<double, double>>& DataSet){
     min_x = nan("");
     max_y = nan("");
     max_x = nan("");
-    dataSetModified();
 }
 }
