@@ -34,6 +34,7 @@ public:
     Style style;
     virtual std::tuple<double,double,double,double> getRange() const = 0;
     virtual const std::list<std::pair<double,double>>& getData() const = 0;
+    //TODO: Give it some config struct
     PlotData(char Symbol = 'o',std::string Name = "", Style Style = Style::dots, Color color = Color::none);
     virtual ~PlotData();
     const std::string& getName() const;

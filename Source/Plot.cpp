@@ -3,7 +3,17 @@
 #include <memory>
 #include <algorithm>
 
+
 namespace chart {
+
+// This of course is poor operator but works well enough for operations on std::list
+bool operator==(std::weak_ptr<chart::PlotData> d1, const std::weak_ptr<chart::PlotData> d2)
+{
+    if (d1.expired() || d2.expired())
+        return false;
+    return d1.lock() == d2.lock();
+}
+
 Plot::Plot(std::pair<uint16_t, uint16_t> WindowSize,
     double CellAspectRatio
     ) :
@@ -16,39 +26,10 @@ Plot::Plot(std::pair<uint16_t, uint16_t> WindowSize,
 {
 }
 
-Plot::~Plot()
-{
-    for (PlotData* data : dataSets){
-        data->plots.remove(this);
-    }
-}
-
-
-void Plot::addDataSet(PlotData* plotData){
+void Plot::addDataSet(const std::weak_ptr<PlotData> plotData){
     if (std::find(dataSets.begin(),dataSets.end(),plotData) != dataSets.end())
         return;
     dataSets.push_back(plotData);
-    plotData->plots.push_back(this);
-
-}
-
-void Plot::addDataSet(std::vector<PlotData*>& plotData){
-    for (PlotData* dataSet : plotData){
-        if (std::find(dataSets.begin(),dataSets.end(),dataSet) != dataSets.end())
-            continue;
-        dataSets.push_back(dataSet);
-        dataSet->plots.push_back(this);
-
-    }
-}
-
-void Plot::addDataSet(std::list<PlotData*>& plotData){
-    for (PlotData* dataSet : plotData){
-        if (std::find(dataSets.begin(),dataSets.end(),dataSet) != dataSets.end())
-            continue;
-        dataSets.push_back(dataSet);
-        dataSet->plots.push_back(this);
-    }
 }
 
 void Plot::setVisibleRange(std::pair<double,double> Xrange, std::pair<double,double> Yrange){
@@ -258,9 +239,8 @@ const double& Plot::getCellAspectRatio() const{
     return cellAspectRatio;
 }
 
-void Plot::removeDataSet(PlotData* removed){
+void Plot::removeDataSet(std::weak_ptr<PlotData> removed){
     dataSets.remove(removed);
-    removed->plots.remove(this);
 }
 
 
@@ -270,7 +250,12 @@ std::tuple<double,double,double,double> Plot::getRange(){
     double min_y = __DBL_MAX__;
     double max_x = __DBL_MIN__;
     double max_y = __DBL_MIN__;
-    for(PlotData* data : dataSets){
+    // TODO: Fancy wraper with iterator returning shared_ptr, maybe include datasets cleanup in it so it's more obscure 
+    for(std::weak_ptr<PlotData> weak_data : dataSets){
+        if (weak_data.expired())
+            // FIXME: this is a memory leak
+            continue;
+        auto data = weak_data.lock();
         auto range = data->getRange();
         if (std::isnan(std::get<0>(range)))
             break;
@@ -306,8 +291,13 @@ std::tuple<int,int,int,int> Plot::generate(){
             if (Y > max_y)
                 max_y = Y;
         }
-    for (auto dataSet : dataSets)
-        drawOnChartMap(*dataSet);
+    for (const auto weak_data : dataSets) {
+        if (weak_data.expired())
+            continue;
+        auto data = weak_data.lock();
+        // TODO: can take in some sort of ptr
+        drawOnChartMap(*data);
+    }
     for (IDecoration* decoration : decorations)
         if(decoration->isForced()){
             auto [x,X,y,Y] = decoration->drawFrame(ChartMap,
@@ -344,16 +334,23 @@ std::string Plot::print(){
     return result;
 }
 
-std::string Plot::getLegend(){
+// TODO: Give user more control
+std::string Plot::getLegend()
+{
     std::string Legend;
-    //Totally readable code
-    auto x = *(std::max_element(dataSets.begin(),dataSets.end(),
-    [](const PlotData* a, const PlotData* b){
-        return a->getName().length() <  b->getName().length();
-    }));
-    auto Max = x->getName().length();
-    for (PlotData* dataSet : dataSets){
-        Legend += dataSet->getName() + std::string(Max - dataSet->getName().length(),'.') + dataSet->getStyledSymbol() + "\033[39m\n";
+    uint Max = 0;
+    for (const auto weak_data : dataSets) {
+        if (weak_data.expired())
+            continue;
+        auto data = weak_data.lock();
+        Max = Max < data->getName().length() ? data->getName().length() : Max;
+    }
+
+    for (const auto weak_data : dataSets) {
+        if (weak_data.expired())
+            continue;
+        auto data = weak_data.lock();
+        Legend += data->getName() + std::string(Max - data->getName().length(),'.') + data->getStyledSymbol() + "\033[39m\n";
     }
     return Legend;
 }
@@ -393,3 +390,5 @@ void Plot::removeDecoration(IDecoration* decoration){
 }
 
 }
+
+
