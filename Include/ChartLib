@@ -1,3 +1,4 @@
+//TODO: get rid of this file
 #pragma once
 #include <Color.hpp>
 #include <Style.hpp>
@@ -5,5 +6,4 @@
 #include <Plot.hpp>
 #include <PlotData.hpp>
 #include <PlotDataSet.hpp>
-#include <PlotDataOrderedSet.hpp>
 #include <PlotDataFunction.hpp>

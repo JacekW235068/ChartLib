@@ -4,10 +4,11 @@
 #include <iostream>
 #include <tuple>
 #include <map>
+#include <memory>
 
 #include <PlotData.hpp>
 #include <Scale.hpp>
-#include<IDecoration.hpp>
+#include <IDecoration.hpp>
 
 
 /**
@@ -30,7 +31,8 @@ private:
     // DATA
     double cellAspectRatio;
     std::pair<uint16_t, uint16_t> windowSize;
-    std::list<PlotData*> dataSets;
+    // TODO: Make it set?
+    std::list<std::weak_ptr<PlotData>> dataSets;
     std::list<IDecoration*> decorations;
     // range of chart
     double visible_min_y;
@@ -59,8 +61,7 @@ public:
     Plot(
         std::pair<uint16_t, uint16_t> WindowSize,
         double CellAspectRatio = 0.5
-        );
-    ~Plot();
+    );
 
     // METHODS
     // Imma let you guess what it does
@@ -95,27 +96,13 @@ public:
      *
      * @param plotData pointer to single dataset.
      */
-    void addDataSet(PlotData* plotData);
-    /**
-     * @overload
-     * Adds datasets to chart and prints them right away if visible range is set.
-     *
-     * @param plotData `vector` of datasets pointers to include in chart
-     */
-    void addDataSet(std::vector<PlotData*>& plotData);
-    /**
-     * @overload
-     * Adds datasets to chart and prints them right away if visible range is set.
-     *
-     * @param plotData `list` of datasets pointers to include in chart
-     */
-    void addDataSet(std::list<PlotData*>& plotData);
+    void addDataSet(const std::weak_ptr<PlotData> plotData);
     /**
      * Removes a single dataset from chart
      *
      * @param removed reference to the **exact** dataset that is to be removed.
      */
-    void removeDataSet(PlotData* removed);
+    void removeDataSet(std::weak_ptr<PlotData> removed);
 
     void addDecoration(IDecoration* decoration);
     void addDecoration(std::vector<IDecoration*> decorations);
@@ -128,7 +115,5 @@ public:
      * @return Chart in strgin format
      */
     std::string print();
-    // FRIENDS & STUFF
-    friend PlotData::~PlotData();// please someone delete this line after I die, I don't want anyone seeing it.
 };
 }

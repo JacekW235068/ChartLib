@@ -11,12 +11,10 @@ PlotData::PlotData (char Symbol,std::string Name, Style Style, Color Color)
     setStyledSymbol();
 }
 
-PlotData::~PlotData(){
-    for(Plot* plot : plots){
-        plot->dataSets.remove(this);
-    }
-}
+// TODO: This whol shit has to go, switch to weak_ptr
+PlotData::~PlotData(){}
 
+// TODO: Move elsewhere
 std::string PlotData::mapColor(Color color){
     switch(color){
         case Color::RED:
