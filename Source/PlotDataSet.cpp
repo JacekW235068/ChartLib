@@ -2,7 +2,7 @@
 
 
 namespace chart {
-
+// TODO: Do something about sending data to constructor
 PlotDataSet::PlotDataSet(std::list<std::pair<double, double>> DataSet, char Symbol, std::string Name, Color color, Style Style) 
 : PlotData(Symbol, Name, Style, color), 
 dataSet(DataSet){
