@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Style.hpp>
-#include <Scale.hpp>
-#include <Color.hpp>
+#include <ChartLib/Style.hpp>
+#include <ChartLib/Scale.hpp>
+#include <ChartLib/Color.hpp>
 #include <list>
 #include <tuple>
 #include <cmath>

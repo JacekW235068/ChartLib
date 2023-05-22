@@ -1,9 +1,0 @@
-//TODO: get rid of this file
-#pragma once
-#include <Color.hpp>
-#include <Style.hpp>
-#include <Scale.hpp>
-#include <Plot.hpp>
-#include <PlotData.hpp>
-#include <PlotDataSet.hpp>
-#include <PlotDataFunction.hpp>
