@@ -1,4 +1,4 @@
-#include <Plot.hpp>
+#include <ChartLib/Plot.hpp>
 
 #include <memory>
 #include <algorithm>

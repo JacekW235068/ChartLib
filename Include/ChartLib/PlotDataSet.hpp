@@ -1,10 +1,11 @@
 #pragma once
-#include <Style.hpp>
+// TODO: Rearange includes into one convention
+#include <ChartLib/Style.hpp>
 #include <vector>
 #include <tuple>
 #include <cmath>
 #include <functional>
-#include <PlotData.hpp>
+#include <ChartLib/PlotData.hpp>
 
 namespace chart {
 

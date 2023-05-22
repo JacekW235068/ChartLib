@@ -1,4 +1,4 @@
-#include <XAxisLabels.hpp>
+#include <ChartLib/XAxisLabels.hpp>
 
 #include <iomanip>
 #include <cmath>

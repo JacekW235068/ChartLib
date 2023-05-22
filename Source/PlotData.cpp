@@ -1,5 +1,5 @@
-#include <PlotData.hpp>
-#include <Plot.hpp>
+#include <ChartLib/PlotData.hpp>
+#include <ChartLib/Plot.hpp>
 
 #include <memory>
 

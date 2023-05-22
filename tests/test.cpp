@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
-#include <Plot.hpp>
-#include <PlotDataSet.hpp>
+#include <ChartLib/Plot.hpp>
+#include <ChartLib/PlotDataSet.hpp>
 #include <cctype>
 
 TEST_CASE("Interaction with PlotData" "[Plot]")

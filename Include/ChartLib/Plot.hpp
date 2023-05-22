@@ -6,9 +6,9 @@
 #include <map>
 #include <memory>
 
-#include <PlotData.hpp>
-#include <Scale.hpp>
-#include <IDecoration.hpp>
+#include <ChartLib/PlotData.hpp>
+#include <ChartLib/Scale.hpp>
+#include <ChartLib/IDecoration.hpp>
 
 
 /**

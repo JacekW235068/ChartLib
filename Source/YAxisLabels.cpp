@@ -1,4 +1,4 @@
-#include <YAxisLabels.hpp>
+#include <ChartLib/YAxisLabels.hpp>
 
 #include <iomanip>
 #include <cmath>
