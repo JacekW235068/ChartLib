@@ -76,7 +76,7 @@ void Plot::visibleRange_scaley(double center){
     auto [min_x,max_x,min_y,max_y] = getRange();
     if (std::isnan(center))
         center = (max_x+min_x)/2;
-    //range of y axis
+    // TODO: Fix warnings
     double valueRangeY = abs(max_y - min_y);
     visible_min_y = min_y;
     visible_max_y = max_y;
@@ -148,7 +148,6 @@ void Plot::drawLines(PlotData& plotData){
         long y = static_cast<long>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
         long x =static_cast<long>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         drawLine(previousCoords, {x,y}, plotData.getStyledSymbol());
-        //new polong becomes old
         previousCoords = {x,y};
     }
 }

@@ -25,7 +25,6 @@ protected:
     Color color;
     std::string name;
     std::string styledSymbol;
-    static std::string mapColor(Color color);
     void setStyledSymbol();
     std::list<Plot*> plots;
 public:

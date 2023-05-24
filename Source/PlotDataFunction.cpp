@@ -45,7 +45,7 @@ void PlotDataFunction::regenerateDataSet(){
      double y = fun(x);
      min_y = y;
      max_y = y;
-     for(x ; x <= max_x; x= x+accuracy){
+     for(; x <= max_x;  x+=accuracy){
           y = fun(x);
           dataSet.push_back({x,y});
           if(y < min_y)
