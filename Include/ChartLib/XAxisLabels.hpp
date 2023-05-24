@@ -1,5 +1,5 @@
 #include <ChartLib/IDecoration.hpp>
-
+// TODO: Move details and implementation into seprate dirs
 
 namespace chart{
 class XAxisLabels : public IDecoration{
