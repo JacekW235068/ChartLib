@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+
 namespace chart{
 
 enum class Color{

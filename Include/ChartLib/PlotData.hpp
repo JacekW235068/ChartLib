@@ -1,8 +1,8 @@
 #pragma once
-
 #include <ChartLib/Style.hpp>
 #include <ChartLib/Scale.hpp>
 #include <ChartLib/Color.hpp>
+
 #include <list>
 #include <tuple>
 #include <cmath>
@@ -43,10 +43,6 @@ public:
     const Color& getColor() const;
     void setColor(Color Color);
     const std::string& getStyledSymbol() const;
-    
-    // FRIENDS & STUFF
-    // manipulates plots list
-    friend class Plot;
 };
  
 }

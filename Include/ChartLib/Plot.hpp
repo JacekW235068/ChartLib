@@ -1,4 +1,8 @@
 #pragma once
+#include <ChartLib/PlotData.hpp>
+#include <ChartLib/Scale.hpp>
+#include <ChartLib/IDecoration.hpp>
+
 #include <vector>
 #include <list>
 #include <iostream>
@@ -6,16 +10,7 @@
 #include <map>
 #include <memory>
 
-#include <ChartLib/PlotData.hpp>
-#include <ChartLib/Scale.hpp>
-#include <ChartLib/IDecoration.hpp>
 
-
-/**
- * ChartLib namespace
- *
- * Read more at https://github.com/JacekW235068/ChartLib/blob/master/README.md
- */
 namespace chart {
 
 /**
