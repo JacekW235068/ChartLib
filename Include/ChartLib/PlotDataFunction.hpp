@@ -1,9 +1,12 @@
 #pragma once
 #include <ChartLib/Style.hpp>
+#include <ChartLib/PlotData.hpp>
+
 #include <tuple>
 #include <cmath>
 #include <functional>
-#include <ChartLib/PlotData.hpp>
+
+
 namespace chart{
     
 class PlotDataFunction : public PlotData

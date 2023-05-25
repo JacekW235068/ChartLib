@@ -152,6 +152,7 @@ void Plot::drawLines(PlotData& plotData){
     }
 }
 
+// TODO: Method params constness
 void Plot::drawLine(std::pair<long, long> p1, std::pair<long,long> p2,const std::string &symbol){
     //straight line X
     if (p1.first == p2.first){

@@ -1,8 +1,11 @@
-#include <catch2/catch_test_macros.hpp>
 #include <ChartLib/Plot.hpp>
 #include <ChartLib/PlotDataSet.hpp>
+
+#include <catch2/catch_test_macros.hpp>
+
 #include <cctype>
 
+// TODO: CTest?
 TEST_CASE("Interaction with PlotData" "[Plot]")
 {
     chart::Plot sut({10,10});
