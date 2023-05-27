@@ -19,13 +19,14 @@ public:
      * @param WindowSize Dimmensions of a window described by `ChartMap`
      * @param VisibleRange Visible range of drawn plot
      * 
-     * @return min max X and min max Y of ChartMap after changes made by decoration (can also be negative values if something is drawn to the left of above chart)
+     * @return deprecated
      */
     virtual std::tuple<int,int,int,int> drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange) = 0;
     
+    //TODO: give minigful name and change to some kind of property
     virtual bool isForced() const = 0;
     virtual ~IDecoration() = default;
 };

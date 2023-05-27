@@ -65,7 +65,10 @@ class TestingDecoration : public chart::IDecoration
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange)
     {
-        return {-1,WindowSize.first,0,WindowSize.second+1};
+        ChartMap[{-1,5}] = " ";
+        // This is actually out of window size, Indexing !!!
+        ChartMap[{0,WindowSize.second}] = " ";
+        return {-42,-42,-42,-42};
     }
     
     virtual bool isForced() const
@@ -77,7 +80,7 @@ class TestingDecoration : public chart::IDecoration
 
 TEST_CASE( "Drawing has proper size", "[Drawing]")
 {
-    const int x=10 ,y=10;
+    const int x=10 ,y=12;
     chart::Plot sut({x,y});
     chart::IDecoration* decoration = new TestingDecoration();
 
@@ -91,7 +94,6 @@ TEST_CASE( "Drawing has proper size", "[Drawing]")
     {
         sut.addDecoration(decoration);
         std::string out = sut.print();
-        std::cout << "---\n" <<  out << "---\n";
         REQUIRE(out.size() == (x+1)*(y+1) + y+1);
     }
 
