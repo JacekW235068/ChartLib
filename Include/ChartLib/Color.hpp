@@ -47,8 +47,6 @@ inline std::string mapColor(Color color){
             return "\033[35m";
         case Color::none:
             return "\033[39m";
-        default: 
-            return "";
     }
 }
 }

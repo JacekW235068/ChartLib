@@ -25,6 +25,7 @@ private:
 
     // DATA
     double cellAspectRatio;
+    // TODO: unify XY vs YX
     std::pair<uint16_t, uint16_t> windowSize;
     // TODO: Make it set?
     std::list<std::weak_ptr<PlotData>> dataSets;

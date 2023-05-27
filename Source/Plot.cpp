@@ -274,8 +274,8 @@ std::tuple<double,double,double,double> Plot::getRange(){
 std::tuple<int,int,int,int> Plot::generate(){
     int min_x = 0;
     int min_y = 0;
-    int max_y = windowSize.second-1;
-    int max_x = windowSize.first-1;
+    int max_y = windowSize.second;
+    int max_x = windowSize.first;
 
     for (IDecoration* decoration : decorations)
         if(!decoration->isForced()){
@@ -312,7 +312,8 @@ std::tuple<int,int,int,int> Plot::generate(){
             if (Y > max_y)
                 max_y = Y;
         }
-    return {min_x,max_x,min_y,max_y};
+    // FIXME: dirty hack but it does keep windows size if decoration returns exact window size it got
+    return {min_x,max_x-1,min_y,max_y-1};
 }
 
 std::string Plot::print(){
