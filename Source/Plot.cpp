@@ -271,25 +271,15 @@ std::tuple<double,double,double,double> Plot::getRange(){
     return std::make_tuple(min_x,max_x,min_y,max_y);
 }
 
-std::tuple<int,int,int,int> Plot::generate(){
-    int min_x = 0;
-    int min_y = 0;
-    int max_y = windowSize.second;
-    int max_x = windowSize.first;
+// TODO: return chartmap to avoid temporary field
+void Plot::generate()
+{
 
     for (IDecoration* decoration : decorations)
         if(!decoration->isForced()){
             auto [x,X,y,Y] = decoration->drawFrame(ChartMap,
             windowSize,
             {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
-            if (x < min_x)
-                min_x = x;
-            if (y < min_y)
-                min_y = y;
-            if (X > max_x)
-                max_x = X;
-            if (Y > max_y)
-                max_y = Y;
         }
     for (const auto weak_data : dataSets) {
         if (weak_data.expired())
@@ -303,21 +293,34 @@ std::tuple<int,int,int,int> Plot::generate(){
             auto [x,X,y,Y] = decoration->drawFrame(ChartMap,
             windowSize,
             {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
-            if (x < min_x)
-                min_x = x;
-            if (y < min_y)
-                min_y = y;
-            if (X > max_x)
-                max_x = X;
-            if (Y > max_y)
-                max_y = Y;
         }
-    // FIXME: dirty hack but it does keep windows size if decoration returns exact window size it got
-    return {min_x,max_x-1,min_y,max_y-1};
 }
 
-std::string Plot::print(){
-    auto [min_x,max_x,min_y,max_y] = generate();
+std::tuple<int,int,int,int> Plot::getAdjustedBoundries()
+{
+    int min_x=0;
+    int min_y=0;
+    int max_x=windowSize.first-1;
+    int max_y=windowSize.second-1;
+    for (const auto [xy,_] : ChartMap) {
+        const auto[x,y] = xy;
+            if (x < min_x)
+                min_x = x;
+            else if (x > max_x)
+                max_x = x;
+            if (y < min_y)
+                min_y = y;
+            else if (y > max_y)
+                max_y = y;
+    }
+    return {min_x,max_x,min_y,max_y};
+}
+
+std::string Plot::print()
+{
+    generate();
+    const auto [min_x,max_x,min_y,max_y] = getAdjustedBoundries();
+
     std::string result;
     result.reserve(windowSize.first*windowSize.second+21);
     auto plot_it = ChartMap.begin();

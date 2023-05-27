@@ -50,7 +50,18 @@ private:
     void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
     // PlotDataConnection methods
     void drawOnChartMap(PlotData& plotData);
-    std::tuple<int,int,int,int> generate();
+    /**
+     * Generates a plot and its decorations in [y,x]->char map form
+     */
+    void generate();
+    /**
+     * Finds draing borders after generating decorations
+     * 
+     * @note plot starts at 0,0 therefore decorations can generate values below 0 
+     * 
+     * @return min_x,max_x,min_y,max_y
+     */
+    std::tuple<int,int,int,int> getAdjustedBoundries();
 public:
 
     // CONSTRUCTORS
@@ -60,9 +71,10 @@ public:
     );
 
     // METHODS
-    // Imma let you guess what it does
+    /**
+     * @return returns XY window size
+     */
     const std::pair<uint16_t, uint16_t>& getWindowSize() const;
-    // Imma let you guess what it does
     const double& getCellAspectRatio() const;
     /**
      * @return Legend generated based on names and symbols of included datasets
