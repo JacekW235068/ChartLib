@@ -22,7 +22,7 @@ public:
      char Symbol = 'o',
      std::string Name = "",
      Color color = Color::none, 
-     Style Style = Style::dots);
+     Style Style = Style::Dots);
     void setRange(std::pair<double,double> XRange);
     void setFunction(double (*Fun)(double));
     std::tuple<double,double,double,double> getRange() const;

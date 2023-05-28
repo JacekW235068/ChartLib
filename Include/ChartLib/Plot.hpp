@@ -20,6 +20,7 @@ namespace chart {
  *
  */
 class Plot
+// TODO: Naming, chart - plot ?
 {
 private:
 

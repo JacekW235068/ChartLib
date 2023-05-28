@@ -100,3 +100,63 @@ TEST_CASE( "Drawing has proper size", "[Drawing]")
     // TODO: get rid of row pointers on interface
     delete decoration;
 }
+
+TEST_CASE( "Puting data on the plot", "[Drawing]")
+{
+    const int x=10 ,y=12;
+    chart::Plot sut({x,y});
+    sut.setVisibleRange({-1.0,1.5},{2.0,2.5});
+
+    SECTION ("only visible dots are on the plot")
+    {
+        std::list<std::pair<double, double>> data = {{-1.0,0.0},{-0.9,2.2},{-0.0,2.3}};
+        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Dots));
+        sut.addDataSet(dataSet);
+        auto out = sut.print();
+        std::cout << "----------\n" << out;
+        REQUIRE(std::count(out.begin(),out.end(),'o') == 2);
+    }
+    SECTION ("Dots at borders are visible")
+    {
+        std::list<std::pair<double, double>> data = {
+            {-1.0,2.0},
+            {-1.0,2.5},
+            { 1.5,2.0},
+            { 1.5,2.5},
+            {-1.0,2.2},
+            { 0.0,2.5}
+        };
+        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Dots));
+        sut.addDataSet(dataSet);
+        auto out = sut.print();
+        std::cout << "----------\n" << out;
+        REQUIRE(std::count(out.begin(),out.end(),'o') == 6);
+    }
+    SECTION ("Full line on the plot")
+    {
+        std::list<std::pair<double, double>> data = {{-0.9,2.2},{0.0,2.3}};
+        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));
+        sut.addDataSet(dataSet);
+        auto out = sut.print();
+        std::cout << "----------\n" << out;
+        REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
+    }
+    SECTION ("Half line on the plot")
+    {
+        std::list<std::pair<double, double>> data = {{-2.0,2.2},{0.0,2.3}};
+        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));
+        sut.addDataSet(dataSet);
+        auto out = sut.print();
+        std::cout << "----------\n" << out;
+        REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
+    }
+    SECTION ("Line with no ends on the plot")
+    {
+        std::list<std::pair<double, double>> data = {{-2.0,2.2},{3.0,2.3}};
+        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));
+        sut.addDataSet(dataSet);
+        auto out = sut.print();
+        std::cout << "----------\n" << out;
+        REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
+    }
+}

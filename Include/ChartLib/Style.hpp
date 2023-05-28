@@ -2,7 +2,7 @@
 
 namespace chart {
 enum class Style { 
-    dots,
+    Dots,
     Linear
 };
 }

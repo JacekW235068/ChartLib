@@ -145,6 +145,7 @@ void Plot::drawLines(PlotData& plotData){
         static_cast<long>(round((visible_max_y - dataSet.begin()->second)/visibleRangeY*(windowSize.second-1)))
     );  
     for(const std::pair<double,double>& data : dataSet){
+        // TODO: extract
         long y = static_cast<long>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
         long x =static_cast<long>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
         drawLine(previousCoords, {x,y}, plotData.getStyledSymbol());
@@ -365,7 +366,7 @@ void Plot::drawOnChartMap(PlotData& plotData){
         case Style::Linear:
             drawLines(plotData);
             break;
-        case Style::dots:
+        case Style::Dots:
             drawDots(plotData);
             break;
         default: break;
