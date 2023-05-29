@@ -46,7 +46,8 @@ private:
     std::map<std::pair<int,int>, std::string> drawDots(const std::shared_ptr<PlotData> plotData);
     std::map<std::pair<int,int>, std::string> drawLines(const std::shared_ptr<PlotData> plotData);
     // Draw line between p1 and p2
-    std::map<std::pair<int,int>, std::string> drawLine(const std::pair<long,long>& p1, const std::pair<long,long>& p2, const std::string &symbol);
+    template <typename T>
+    void drawLine(const std::pair<long,long>& p1, const std::pair<long,long>& p2, const std::string &symbol, T inserter);
     // PlotDataConnection methods
     std::map<std::pair<int,int>, std::string> mapDataOnCanvas(const std::shared_ptr<PlotData> plotData);
     /**

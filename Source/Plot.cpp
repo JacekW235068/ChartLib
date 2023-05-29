@@ -149,8 +149,7 @@ std::map<std::pair<int,int>, std::string> Plot::drawLines(const std::shared_ptr<
         // TODO: extract
         long y = static_cast<long>(round((visible_max_y - data.second)/visibleRangeY*(windowSize.second-1)));
         long x =static_cast<long>(round((data.first-visible_min_x)/visibleRangeX*(windowSize.first-1)));
-        const auto points = drawLine(previousCoords, {x,y}, plotData->getStyledSymbol());
-        chartMap.insert(points.begin(),points.end());
+        drawLine(previousCoords, {x,y}, plotData->getStyledSymbol(), std::inserter(chartMap, chartMap.end()));
         previousCoords = {x,y};
     }
     return chartMap;
@@ -158,9 +157,9 @@ std::map<std::pair<int,int>, std::string> Plot::drawLines(const std::shared_ptr<
 
 // TODO: Method params constness
 // Returning map is sort of clean but generates at least one copy, consider passing as reference or std::inserter
-std::map<std::pair<int,int>, std::string> Plot::drawLine(const std::pair<long, long>& p1, const std::pair<long,long>& p2, const std::string &symbol)
+template <typename T>
+void Plot::drawLine(const std::pair<long, long>& p1, const std::pair<long,long>& p2, const std::string &symbol, T inserter)
 {
-    std::map<std::pair<int,int>, std::string> chartMap;
     //straight line X
     if (p1.first == p2.first){
         //is line in visible field?
@@ -169,7 +168,7 @@ std::map<std::pair<int,int>, std::string> Plot::drawLine(const std::pair<long, l
             long YlowerCoords = std::max(0L, std::min(p1.second, p2.second));
             long YupperCoords = std::min(static_cast<long>(windowSize.second-1), std::max(p1.second, p2.second));
             while (YlowerCoords <= YupperCoords){
-                chartMap[{YlowerCoords, p1.first}] = symbol;
+                inserter = {{YlowerCoords, p1.first}, symbol};
                 YlowerCoords ++;
             }
         }
@@ -180,7 +179,7 @@ std::map<std::pair<int,int>, std::string> Plot::drawLine(const std::pair<long, l
             long XlowerCoords = std::max(0L, std::min(p1.first, p2.first));
             long XupperCoords = std::min(static_cast<long>(windowSize.first-1), std::max(p1.first, p2.first));
             while (XlowerCoords <= XupperCoords){
-       		    chartMap[{p1.second, XlowerCoords}] = symbol; 
+       		    inserter = {{p1.second, XlowerCoords}, symbol};
                 XlowerCoords ++;
             }
         } 
@@ -209,7 +208,7 @@ std::map<std::pair<int,int>, std::string> Plot::drawLine(const std::pair<long, l
             //y calculated as function of x
             double y = a*XlowerCoord + b;
             while(XlowerCoord <= XupperCoord){
-       		        chartMap[{static_cast<long>(round(y)), XlowerCoord++}] = symbol; 
+       		        inserter = {{static_cast<long>(round(y)), XlowerCoord++}, symbol}; 
                 y+=a;
             }
         }else{
@@ -230,12 +229,11 @@ std::map<std::pair<int,int>, std::string> Plot::drawLine(const std::pair<long, l
             long YupperCoord = std::min( std::min(static_cast<long>(windowSize.second -1), static_cast<long>(round(YupperLimit))), std::max(p1.second, p2.second));
             double x = a*YlowerCoord + b;
             while(YlowerCoord <= YupperCoord){
-       		        chartMap[{(YlowerCoord++),static_cast<long>(round(x))}] = symbol; 
+       		        inserter = {{(YlowerCoord++),static_cast<long>(round(x))}, symbol}; 
                 x+=a;
             }
         }
     }
-    return chartMap;
 }
 
 //DATA ACCESS AND MODIFICATION
