@@ -11,6 +11,7 @@ namespace chart
  */
 class IDecoration{
 public:
+    //TODO: cleanup return type
     /**
      * Prints any sort of additional characters onto finished plot.
      * After IFrame class is assigned to a plot object it is called everytime plot is redrawn.

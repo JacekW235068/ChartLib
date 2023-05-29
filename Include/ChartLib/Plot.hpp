@@ -36,8 +36,6 @@ private:
     double visible_min_x;
     double visible_max_y;
     double visible_max_x;
-    // map with coords !(Y,X)! and symbols to draw onto chart 
-    std::map<std::pair<int,int>, std::string> ChartMap;
 
     // METHODS
     // scaling methods, sets visible range
@@ -45,16 +43,16 @@ private:
     void visibleRange_scaley(double center);
     void visibleRange_stretch();
     // "draws" symbols and saves them in map
-    void drawDots(PlotData& DataSet);
-    void drawLines(PlotData& plotData);
+    std::map<std::pair<int,int>, std::string> drawDots(const std::shared_ptr<PlotData> plotData);
+    std::map<std::pair<int,int>, std::string> drawLines(const std::shared_ptr<PlotData> plotData);
     // Draw line between p1 and p2
-    void drawLine(std::pair<long,long> p1, std::pair<long,long> p2,const std::string &symbol);
+    std::map<std::pair<int,int>, std::string> drawLine(const std::pair<long,long>& p1, const std::pair<long,long>& p2, const std::string &symbol);
     // PlotDataConnection methods
-    void drawOnChartMap(PlotData& plotData);
+    std::map<std::pair<int,int>, std::string> mapDataOnCanvas(const std::shared_ptr<PlotData> plotData);
     /**
      * Generates a plot and its decorations in [y,x]->char map form
      */
-    void generate();
+    std::map<std::pair<int,int>, std::string> generate();
     /**
      * Finds draing borders after generating decorations
      * 
@@ -62,7 +60,7 @@ private:
      * 
      * @return min_x,max_x,min_y,max_y
      */
-    std::tuple<int,int,int,int> getAdjustedBoundries();
+    std::tuple<int,int,int,int> getAdjustedBoundries(const std::map<std::pair<int,int>, std::string>& chartMap);
 public:
 
     // CONSTRUCTORS

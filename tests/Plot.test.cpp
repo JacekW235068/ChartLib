@@ -159,4 +159,5 @@ TEST_CASE( "Puting data on the plot", "[Drawing]")
         std::cout << "----------\n" << out;
         REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
     }
+    // TODO: SECTION ("Line with no ends in visible boundries")
 }
