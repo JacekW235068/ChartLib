@@ -2,6 +2,7 @@
 #include <ChartLib/PlotDataSet.hpp>
 #include <ChartLib/IDecoration.hpp>
 
+#include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <cctype>
@@ -134,30 +135,17 @@ TEST_CASE( "Puting data on the plot", "[Drawing]")
     }
     SECTION ("Full line on the plot")
     {
-        std::list<std::pair<double, double>> data = {{-0.9,2.2},{0.0,2.3}};
+        std::list<std::pair<double, double>> data = GENERATE(
+            std::list<std::pair<double, double>>{{-0.9,2.2},{0.0,2.3}}, // Full line on the plot
+            std::list<std::pair<double, double>>{{-2.0,2.2},{0.0,2.3}}, // Half line on the plot
+            std::list<std::pair<double, double>>{{-2.0,2.2},{3.0,2.3}}, // Line with no ends on the plot
+            std::list<std::pair<double, double>>{{-1.5,1.5},{2.0,3.0}}, // Line with no ends in visible boundries
+            std::list<std::pair<double, double>>{{2.0,3.0},{-1.5,1.5}}  // Reversed Points
+        );
         std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));
         sut.addDataSet(dataSet);
         auto out = sut.print();
         std::cout << "----------\n" << out;
         REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
     }
-    SECTION ("Half line on the plot")
-    {
-        std::list<std::pair<double, double>> data = {{-2.0,2.2},{0.0,2.3}};
-        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));
-        sut.addDataSet(dataSet);
-        auto out = sut.print();
-        std::cout << "----------\n" << out;
-        REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
-    }
-    SECTION ("Line with no ends on the plot")
-    {
-        std::list<std::pair<double, double>> data = {{-2.0,2.2},{3.0,2.3}};
-        std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));
-        sut.addDataSet(dataSet);
-        auto out = sut.print();
-        std::cout << "----------\n" << out;
-        REQUIRE(std::count(out.begin(),out.end(),'o') > 2);
-    }
-    // TODO: SECTION ("Line with no ends in visible boundries")
 }
