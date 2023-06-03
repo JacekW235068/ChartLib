@@ -61,7 +61,7 @@ TEST_CASE("Interaction with PlotData object" "[Plot]")
 
 class TestingDecoration : public chart::IDecoration
 {
-    virtual std::tuple<int,int,int,int> drawFrame(
+    virtual void drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange)
@@ -69,7 +69,6 @@ class TestingDecoration : public chart::IDecoration
         ChartMap[{-1,5}] = " ";
         // This is actually out of window size, Indexing !!!
         ChartMap[{0,WindowSize.second}] = " ";
-        return {-42,-42,-42,-42};
     }
     
     virtual bool isForced() const
@@ -139,7 +138,7 @@ TEST_CASE( "Puting data on the plot", "[Drawing]")
             std::list<std::pair<double, double>>{{-0.9,2.2},{0.0,2.3}}, // Full line on the plot
             std::list<std::pair<double, double>>{{-2.0,2.2},{0.0,2.3}}, // Half line on the plot
             std::list<std::pair<double, double>>{{-2.0,2.2},{3.0,2.3}}, // Line with no ends on the plot
-            std::list<std::pair<double, double>>{{-1.5,1.5},{2.0,3.0}}, // Line with no ends in visible boundries
+            std::list<std::pair<double, double>>{{-1.5,1.5},{2.0,3.0}}, // Line with no ends in any visible boundries
             std::list<std::pair<double, double>>{{2.0,3.0},{-1.5,1.5}}  // Reversed Points
         );
         std::shared_ptr<chart::PlotDataSet> dataSet(new chart::PlotDataSet(data,'o',"test set",chart::Color::none,chart::Style::Linear));

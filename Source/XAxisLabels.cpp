@@ -9,7 +9,7 @@ namespace chart{
 XAxisLabels::XAxisLabels(uint Precision, double Jump, double Start) : precision(Precision), jump(Jump), start(Start)
 {}
 
-std::tuple<int,int,int,int> XAxisLabels::drawFrame(
+void XAxisLabels::drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange) {
@@ -50,7 +50,6 @@ std::tuple<int,int,int,int> XAxisLabels::drawFrame(
         x += jump;
         xCell = static_cast<int>(round((x-get<0>(VisibleRange))/visibleRangeX*(WindowSize.first-1)));
     }
-    return {min_x,lastNumberCell,0,WindowSize.second+1};
 }
 
 bool XAxisLabels::isForced() const {

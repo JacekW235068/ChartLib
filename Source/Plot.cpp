@@ -284,7 +284,7 @@ std::map<std::pair<int,int>, std::string> Plot::generate()
     std::map<std::pair<int,int>, std::string> chartMap;
     for (IDecoration* decoration : decorations)
         if(!decoration->isForced()){
-            auto [x,X,y,Y] = decoration->drawFrame(chartMap,
+            decoration->drawFrame(chartMap,
             windowSize,
             {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
         }
@@ -296,7 +296,7 @@ std::map<std::pair<int,int>, std::string> Plot::generate()
     }
     for (IDecoration* decoration : decorations)
         if(decoration->isForced()){
-            auto [x,X,y,Y] = decoration->drawFrame(chartMap,
+            decoration->drawFrame(chartMap,
             windowSize,
             {visible_min_x,visible_max_x,visible_min_y,visible_max_y});
         }

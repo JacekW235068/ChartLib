@@ -9,7 +9,7 @@ namespace chart{
 YAxisLabels::YAxisLabels(uint Precision, double Jump, double Start) : precision(Precision), jump(Jump), start(Start)
 {}
 
-std::tuple<int,int,int,int> YAxisLabels::drawFrame(
+void YAxisLabels::drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange) {
@@ -45,7 +45,6 @@ std::tuple<int,int,int,int> YAxisLabels::drawFrame(
         y += jump;
         yCell = static_cast<int>(round((get<3>(VisibleRange) - y)/visibleRangeY*(WindowSize.second-1)));
     }
-    return {0,WindowSize.first + maxLength,0,WindowSize.second-1};
 }
 
 bool YAxisLabels::isForced() const {

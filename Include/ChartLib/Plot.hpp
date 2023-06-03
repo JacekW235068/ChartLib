@@ -53,6 +53,7 @@ private:
      * Generates a plot and its decorations in [y,x]->char map form
      */
     std::map<std::pair<int,int>, std::string> generate();
+    //TODO: replace tuples with structs or at leas typedefs
     /**
      * Finds draing borders after generating decorations
      * 

@@ -19,10 +19,8 @@ public:
      * @param ChartMap Map of !(Y,X)! coords with printed plot
      * @param WindowSize Dimmensions of a window described by `ChartMap`
      * @param VisibleRange Visible range of drawn plot
-     * 
-     * @return deprecated
      */
-    virtual std::tuple<int,int,int,int> drawFrame(
+    virtual void drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange) = 0;

@@ -3,7 +3,7 @@
 namespace chart{
 
 
-std::tuple<int,int,int,int> SimpleDoubleLineFrame::drawFrame(
+void SimpleDoubleLineFrame::drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
         const std::tuple<double,double,double,double>& VisibleRange) {
@@ -22,7 +22,6 @@ std::tuple<int,int,int,int> SimpleDoubleLineFrame::drawFrame(
         ChartMap[{i,-1}] = u8"║";
         ChartMap[{i,WindowSize.first}] = u8"║";
     }
-    return {-1,WindowSize.first,-1,WindowSize.second};
 }
 
 bool SimpleDoubleLineFrame::isForced() const {
