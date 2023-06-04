@@ -7,7 +7,6 @@
 
 #include <cctype>
 
-// TODO: CTest?
 TEST_CASE("Interaction with PlotData object" "[Plot]")
 {
     chart::Plot sut({10,10});

@@ -43,12 +43,12 @@ private:
     void visibleRange_scaley(double center);
     void visibleRange_stretch();
     // "draws" symbols and saves them in map
-    std::map<std::pair<int,int>, std::string> drawDots(const std::shared_ptr<PlotData> plotData);
-    std::map<std::pair<int,int>, std::string> drawLines(const std::shared_ptr<PlotData> plotData);
+    void drawDots(const std::shared_ptr<PlotData> plotData, std::map<std::pair<int,int>, std::string>& canvas);
+    void drawLines(const std::shared_ptr<PlotData> plotData, std::map<std::pair<int,int>, std::string>& canvas);
     // Draw line between p1 and p2
-    std::map<std::pair<int,int>, std::string> drawLine(const std::pair<long,long>& p1, const std::pair<long,long>& p2, const std::string &symbol);
+    void drawLine(const std::pair<long,long>& p1, const std::pair<long,long>& p2, const std::string &symbol, std::map<std::pair<int,int>, std::string>& canvas);
     // PlotDataConnection methods
-    std::map<std::pair<int,int>, std::string> mapDataOnCanvas(const std::shared_ptr<PlotData> plotData);
+    void mapDataOnCanvas(const std::shared_ptr<PlotData> plotData, std::map<std::pair<int,int>, std::string>& canvas);
     /**
      * Generates a plot and its decorations in [y,x]->char map form
      */
