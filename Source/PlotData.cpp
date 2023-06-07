@@ -6,7 +6,7 @@
 namespace chart {
 
 PlotData::PlotData (char Symbol,std::string Name, Style Style, Color Color) 
-: symbol(Symbol), style(Style), color(Color), min_x(nan("")), max_x(nan("")), min_y(nan("")), max_y(nan("")), name(Name)
+: color(Color), name(Name), symbol(Symbol), min_x(nan("")), max_x(nan("")), min_y(nan("")), max_y(nan("")), style(Style)
 {
     setStyledSymbol();
 }

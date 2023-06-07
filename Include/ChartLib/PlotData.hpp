@@ -14,22 +14,18 @@ class Plot;
 
 class PlotData
 {
-
 protected:
-    //cached range
-    mutable double min_x;
-    mutable double min_y;
-    mutable double max_x;
-    mutable double max_y;
-    //Symbol to represent data on chart
+    void setStyledSymbol();
+
     Color color;
     std::string name;
-    std::string styledSymbol;
-    void setStyledSymbol();
-    std::list<Plot*> plots;
-public:
     char symbol;
-    //line,Dots, that kinda stuff
+    mutable double min_x;
+    mutable double max_x;
+    mutable double min_y;
+    mutable double max_y;
+    std::string styledSymbol;
+public:
     Style style;
     virtual std::tuple<double,double,double,double> getRange() const = 0;
     virtual const std::list<std::pair<double,double>>& getData() const = 0;

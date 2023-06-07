@@ -77,7 +77,7 @@ void Plot::visibleRange_scaley(double center){
     if (std::isnan(center))
         center = (max_x+min_x)/2;
     // TODO: Fix warnings
-    double valueRangeY = abs(max_y - min_y);
+    double valueRangeY = std::abs(max_y - min_y);
     visible_min_y = min_y;
     visible_max_y = max_y;
     // single point/straight line scenario
@@ -98,7 +98,7 @@ void Plot::visibleRange_scalex(double center){
     if (std::isnan(center))
         center = (max_y+min_y)/2;
     //range of x axis
-    double valueRangeX = abs(max_x - min_x);
+    double valueRangeX = std::abs(max_x - min_x);
     visible_min_x = min_x;
     visible_max_x = max_x;
     // single point/straight line scenario
@@ -180,8 +180,8 @@ void Plot::drawLine(const std::pair<long, long>& p1, const std::pair<long,long>&
         } 
     }
     else{
-        unsigned x_length = abs(p1.first - p2.first);
-        unsigned y_length = abs(p1.second - p2.second);
+        unsigned x_length = std::abs(p1.first - p2.first);
+        unsigned y_length = std::abs(p1.second - p2.second);
         //pick one with higher 'resolution' so it fills everything between two polongs
         if(x_length > y_length){
             //y=ax+b
@@ -302,7 +302,7 @@ std::tuple<int,int,int,int> Plot::getAdjustedBoundries(const std::map<std::pair<
     int min_y=0;
     int max_x=windowSize.first-1;
     int max_y=windowSize.second-1;
-    for (const auto [xy,_] : chartMap) {
+    for (const auto& [xy,_] : chartMap) {
         const auto[x,y] = xy;
             if (x < min_x)
                 min_x = x;

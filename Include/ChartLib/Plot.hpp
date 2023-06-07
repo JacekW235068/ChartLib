@@ -24,18 +24,18 @@ class Plot
 {
 private:
 
-    // DATA
-    double cellAspectRatio;
     // TODO: unify XY vs YX
     std::pair<uint16_t, uint16_t> windowSize;
+    // DATA
+    double cellAspectRatio;
     // TODO: Make it set?
     std::list<std::weak_ptr<PlotData>> dataSets;
     std::list<IDecoration*> decorations;
     // range of chart
-    double visible_min_y;
     double visible_min_x;
-    double visible_max_y;
     double visible_max_x;
+    double visible_min_y;
+    double visible_max_y;
 
     // METHODS
     // scaling methods, sets visible range

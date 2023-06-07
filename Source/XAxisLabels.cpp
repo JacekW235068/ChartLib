@@ -32,7 +32,6 @@ void XAxisLabels::drawFrame(
     stream << fixed << setprecision(precision);
     stream << x;
     string s = stream.str();
-    int min_x = xCell - s.length()/2;
 
     while (xCell < WindowSize.first){
         stream.str(string());
@@ -41,7 +40,7 @@ void XAxisLabels::drawFrame(
         string s = stream.str();
         firstNumberCell = xCell - s.length()/2;
         if (lastNumberCell < firstNumberCell){
-            for(int i = 0; i < s.length(); i++){
+            for(size_t i = 0; i < s.length(); i++){
                 ChartMap[{WindowSize.second+1,firstNumberCell++}] = s[i];
             }
             lastNumberCell = firstNumberCell;

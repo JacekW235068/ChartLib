@@ -63,7 +63,7 @@ class TestingDecoration : public chart::IDecoration
     virtual void drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
-        const std::tuple<double,double,double,double>& VisibleRange)
+        const std::tuple<double,double,double,double>&)
     {
         ChartMap[{-1,5}] = " ";
         // This is actually out of window size, Indexing !!!

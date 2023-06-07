@@ -9,6 +9,7 @@ namespace chart{
 YAxisLabels::YAxisLabels(uint Precision, double Jump, double Start) : precision(Precision), jump(Jump), start(Start)
 {}
 
+// TODO: Rewrite after tests
 void YAxisLabels::drawFrame(
         std::map<std::pair<int,int>, std::string>& ChartMap,
         const std::pair<uint16_t,uint16_t>& WindowSize,
@@ -30,15 +31,12 @@ void YAxisLabels::drawFrame(
     stream << fixed << setprecision(precision);
     stream << y;
     string s = stream.str();
-    int maxLength = 0;
     while (yCell >= 0){
         stream.str(string());
         stream.clear();
         stream << (y==-0.0?0.0:y); // workaround for '-0.0'
         string s = stream.str();
-        if (s.length() > maxLength)
-            maxLength = s.length();
-        for(int i = 0; i < s.length(); i++){
+        for(size_t i = 0; i < s.length(); i++){
             ChartMap[{yCell,WindowSize.first+1+i}] = s[i];
         }
         ChartMap[{yCell,WindowSize.first}] = '.';

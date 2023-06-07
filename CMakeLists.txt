@@ -3,6 +3,7 @@ project(ChartLib VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # TODO: Wall
+add_compile_options(-pedantic -Wall -Wextra -Wno-range-loop-construct)
 # TODO: CTest
 set (SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Plot.cpp;
