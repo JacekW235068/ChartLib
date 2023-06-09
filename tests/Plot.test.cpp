@@ -81,6 +81,7 @@ TEST_CASE( "Drawing has proper size", "[Drawing]")
 {
     const int x=10 ,y=12;
     chart::Plot sut({x,y});
+    sut.setVisibleRange({0.0,1.0},{0.0,1.0});
     chart::IDecoration* decoration = new TestingDecoration();
 
     SECTION("Empty plot")

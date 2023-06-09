@@ -12,6 +12,7 @@ PlotDataSet::~PlotDataSet(){
 
 }
 
+// TODO: remove caching and calculate on the spot
 std::tuple<double,double,double,double> PlotDataSet::getRange() const{
     if(!std::isnan(min_x))
         return std::make_tuple(min_x,max_x,min_y,max_y);

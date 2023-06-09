@@ -76,7 +76,6 @@ void Plot::visibleRange_scaley(double center){
     auto [min_x,max_x,min_y,max_y] = getRange();
     if (std::isnan(center))
         center = (max_x+min_x)/2;
-    // TODO: Fix warnings
     double valueRangeY = std::abs(max_y - min_y);
     visible_min_y = min_y;
     visible_max_y = max_y;
@@ -114,10 +113,8 @@ void Plot::visibleRange_scalex(double center){
     visible_max_y = center + valueRangeY/2;
 }
 
-void Plot::drawDots(const std::shared_ptr<PlotData> DataSet, std::map<std::pair<int,int>, std::string>& canvas){
-    // TODO: extract this
-    if (std::isnan(visible_min_x) or std::isnan(visible_max_x) or std::isnan(visible_min_y) or std::isnan(visible_max_y))
-        return;
+void Plot::drawDots(const std::shared_ptr<PlotData> DataSet, std::map<std::pair<int,int>, std::string>& canvas)
+{
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
 
@@ -131,9 +128,8 @@ void Plot::drawDots(const std::shared_ptr<PlotData> DataSet, std::map<std::pair<
     }
 }
 
-void Plot::drawLines(const std::shared_ptr<PlotData> plotData, std::map<std::pair<int,int>, std::string>& canvas){
-    if (std::isnan(visible_min_x) or std::isnan(visible_max_x) or std::isnan(visible_min_y) or std::isnan(visible_max_y))
-        return;
+void Plot::drawLines(const std::shared_ptr<PlotData> plotData, std::map<std::pair<int,int>, std::string>& canvas)
+{
     double visibleRangeX = visible_max_x - visible_min_x;
     double visibleRangeY = visible_max_y - visible_min_y;
     const auto& dataSet = plotData->getData();
@@ -275,6 +271,9 @@ std::tuple<double,double,double,double> Plot::getRange(){
 
 std::map<std::pair<int,int>, std::string> Plot::generate()
 {
+    if (std::isnan(visible_min_x) or std::isnan(visible_max_x) or std::isnan(visible_min_y) or std::isnan(visible_max_y))
+        return {};
+
     std::map<std::pair<int,int>, std::string> chartMap;
     for (IDecoration* decoration : decorations)
         if(!decoration->isForced()){
